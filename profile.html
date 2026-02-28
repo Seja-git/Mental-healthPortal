@@ -1,66 +1,589 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User Profile | Mental Wellness Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
       body {
-        font-family: Poppins, sans-serif;
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        background: linear-gradient(to right, #a8edea, #fed6e3);
+        padding: 20px;
       }
-      .profile-box {
+
+      .profile-container {
         background: white;
-        padding: 2rem;
-        border-radius: 15px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-        text-align: center;
-        width: 350px;
+        max-width: 1000px;
+        width: 100%;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        animation: slideUp 0.5s ease;
       }
-      h2 {
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .profile-header {
+        background: linear-gradient(135deg, #2b6777, #1e4d5a);
+        color: white;
+        padding: 40px;
+        text-align: center;
+        position: relative;
+      }
+
+      .profile-avatar {
+        width: 120px;
+        height: 120px;
+        background: white;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 60px;
+        color: #2b6777;
+        border: 5px solid rgba(255,255,255,0.3);
+      }
+
+      .profile-header h1 {
+        margin: 0;
+        font-size: 2rem;
+      }
+
+      .profile-header p {
+        margin: 10px 0 0;
+        opacity: 0.9;
+      }
+
+      .profile-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255,255,255,0.2);
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+      }
+
+      .profile-content {
+        padding: 40px;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+      }
+
+      .info-card {
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 15px;
+        transition: transform 0.3s;
+      }
+
+      .info-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .info-card h3 {
+        margin: 0 0 20px 0;
+        color: #2b6777;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.2rem;
+      }
+
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .info-item:last-child {
+        border-bottom: none;
+      }
+
+      .info-label {
+        color: #666;
+        font-weight: 500;
+      }
+
+      .info-value {
+        color: #333;
+        font-weight: 600;
+      }
+
+      .stats-section {
+        background: linear-gradient(135deg, #a8edea, #fed6e3);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+      }
+
+      .stats-section h3 {
+        margin: 0 0 20px 0;
         color: #2b6777;
       }
-      p {
-        font-size: 1rem;
-        margin: 0.5rem 0;
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
       }
+
+      .stat-item {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 32px;
+        font-weight: bold;
+        color: #2b6777;
+      }
+
+      .stat-label {
+        color: #666;
+        font-size: 14px;
+        margin-top: 5px;
+      }
+
+      .assessments-section {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+      }
+
+      .assessments-section h3 {
+        margin: 0 0 20px 0;
+        color: #2b6777;
+      }
+
+      .assessment-item {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-left: 5px solid #2b6777;
+      }
+
+      .severity-badge {
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .severity-minimal { background: #d4edda; color: #155724; }
+      .severity-mild { background: #fff3cd; color: #856404; }
+      .severity-moderate { background: #ffe0b2; color: #b45f06; }
+      .severity-severe { background: #f8d7da; color: #721c24; }
+
+      .appointments-section {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+      }
+
+      .appointment-item {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .status-pending { color: #ffc107; }
+      .status-confirmed { color: #28a745; }
+      .status-completed { color: #6c757d; }
+
       .logout-btn {
-        background: #ff4b5c;
+        width: 100%;
+        padding: 15px;
+        background: #dc3545;
         color: white;
         border: none;
-        padding: 0.7rem 1.5rem;
-        border-radius: 8px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
         cursor: pointer;
-        margin-top: 1rem;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
       }
+
       .logout-btn:hover {
-        background: #d63447;
+        background: #c82333;
+        transform: translateY(-2px);
+      }
+
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+      }
+
+      .loading i {
+        font-size: 40px;
+        color: #2b6777;
+        margin-bottom: 15px;
+      }
+
+      .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .no-data {
+        text-align: center;
+        color: #666;
+        padding: 20px;
+        font-style: italic;
+      }
+
+      .home-btn {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background: #2b6777;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: 0.3s;
+      }
+
+      .home-btn:hover {
+        background: #1e4d5a;
       }
     </style>
   </head>
   <body>
-    <div class="profile-box">
-      <h2>User Profile</h2>
-      <p><b>ID:</b> <span id="userId"></span></p>
-      <p><b>Email:</b> <span id="email"></span></p>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+    <div class="profile-container" id="profileContainer">
+      <div class="profile-header">
+        <div class="profile-avatar" id="profileAvatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <h1 id="userName">User Profile</h1>
+        <p id="userRole">Student</p>
+        <div class="profile-badge" id="memberSince"></div>
+      </div>
+
+      <div class="profile-content" id="profileContent">
+        <div class="loading" id="loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Loading your profile...</p>
+        </div>
+
+        <div id="profileData" style="display: none;">
+          <!-- Info Grid -->
+          <div class="info-grid">
+            <div class="info-card">
+              <h3><i class="fas fa-id-card"></i> Account Details</h3>
+              <div class="info-item">
+                <span class="info-label">Anonymous ID</span>
+                <span class="info-value" id="displayUserId"></span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Email</span>
+                <span class="info-value" id="displayEmail"></span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Role</span>
+                <span class="info-value" id="displayRole"></span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Member Since</span>
+                <span class="info-value" id="displayMemberSince"></span>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <h3><i class="fas fa-shield-alt"></i> Privacy Settings</h3>
+              <div class="info-item">
+                <span class="info-label">Anonymous Mode</span>
+                <span class="info-value">✅ Enabled</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Data Sharing</span>
+                <span class="info-value">🔒 Private</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Notifications</span>
+                <span class="info-value">🔔 On</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats Section -->
+          <div class="stats-section">
+            <h3><i class="fas fa-chart-line"></i> Your Activity</h3>
+            <div class="stats-grid" id="statsGrid">
+              <div class="stat-item">
+                <div class="stat-number" id="totalAssessments">0</div>
+                <div class="stat-label">Assessments Taken</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="totalAppointments">0</div>
+                <div class="stat-label">Appointments</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="forumPosts">0</div>
+                <div class="stat-label">Forum Posts</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="streakDays">0</div>
+                <div class="stat-label">Day Streak</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Assessments -->
+          <div class="assessments-section">
+            <h3><i class="fas fa-clipboard-list"></i> Recent Assessments</h3>
+            <div id="assessmentsList"></div>
+          </div>
+
+          <!-- Upcoming Appointments -->
+          <div class="appointments-section">
+            <h3><i class="fas fa-calendar-check"></i> Upcoming Appointments</h3>
+            <div id="appointmentsList"></div>
+          </div>
+
+          <!-- Logout Button -->
+          <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+          </button>
+
+          <a href="index.html" class="home-btn">
+            <i class="fas fa-home"></i> Back to Home
+          </a>
+        </div>
+      </div>
     </div>
 
     <script>
-      let user = JSON.parse(localStorage.getItem("currentUser"));
-      if (user) {
-        document.getElementById("userId").textContent = user.id;
-        document.getElementById("email").textContent = user.email;
-      } else {
-        alert("No user logged in!");
+      // Check login status immediately
+      const user = JSON.parse(localStorage.getItem('currentUser'));
+      const token = localStorage.getItem('token');
+
+      if (!user || !token) {
+        alert("Please login first");
         window.location.href = "login.html";
       }
+
+      document.addEventListener('DOMContentLoaded', async function() {
+        await loadProfileData();
+      });
+
+      async function loadProfileData() {
+        const loading = document.getElementById('loading');
+        const profileData = document.getElementById('profileData');
+        
+        try {
+          // Show loading
+          loading.style.display = 'block';
+          profileData.style.display = 'none';
+
+          // Get user data
+          const user = JSON.parse(localStorage.getItem('currentUser'));
+          const token = localStorage.getItem('token');
+
+          // Display basic info
+          document.getElementById('displayUserId').textContent = user.id;
+          document.getElementById('displayEmail').textContent = user.email;
+          document.getElementById('displayRole').textContent = user.role;
+          
+          // Set avatar based on role
+          const avatar = document.getElementById('profileAvatar');
+          if (user.role === 'counsellor') {
+            avatar.innerHTML = '<i class="fas fa-user-md"></i>';
+          } else if (user.role === 'organization') {
+            avatar.innerHTML = '<i class="fas fa-building"></i>';
+          } else {
+            avatar.innerHTML = '<i class="fas fa-user-graduate"></i>';
+          }
+
+          // Set member since
+          const memberSince = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+          document.getElementById('memberSince').textContent = `Member since ${memberSince}`;
+
+          // Load assessments from backend
+          try {
+            const response = await fetch(`http://127.0.0.1:5000/api/assessments/${user.id}`, {
+              headers: {
+                'Authorization': 'Bearer ' + token
+              }
+            });
+            
+            if (response.ok) {
+              const assessments = await response.json();
+              displayAssessments(assessments);
+              document.getElementById('totalAssessments').textContent = assessments.length;
+            } else {
+              throw new Error('Failed to load assessments');
+            }
+          } catch (error) {
+            console.log('Using local assessment data');
+            // Fallback to localStorage
+            const localAssessments = JSON.parse(localStorage.getItem('assessments') || '[]')
+              .filter(a => a.user_id === user.id);
+            displayAssessments(localAssessments);
+            document.getElementById('totalAssessments').textContent = localAssessments.length;
+          }
+
+          // Load appointments
+          try {
+            const response = await fetch('http://127.0.0.1:5000/api/appointments/user', {
+              headers: {
+                'Authorization': 'Bearer ' + token
+              }
+            });
+            
+            if (response.ok) {
+              const appointments = await response.json();
+              displayAppointments(appointments);
+              document.getElementById('totalAppointments').textContent = appointments.length;
+            } else {
+              throw new Error('Failed to load appointments');
+            }
+          } catch (error) {
+            console.log('Using local appointment data');
+            const localAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+            displayAppointments(localAppointments);
+            document.getElementById('totalAppointments').textContent = localAppointments.length;
+          }
+
+          // Load forum posts count
+          const forumPosts = JSON.parse(localStorage.getItem('forumPosts') || '[]')
+            .filter(p => p.user_id === user.id).length;
+          document.getElementById('forumPosts').textContent = forumPosts;
+
+          // Calculate streak (mock for now)
+          document.getElementById('streakDays').textContent = Math.floor(Math.random() * 10) + 1;
+
+          // Hide loading, show data
+          loading.style.display = 'none';
+          profileData.style.display = 'block';
+
+        } catch (error) {
+          console.error('Error loading profile:', error);
+          loading.innerHTML = `
+            <i class="fas fa-exclamation-circle" style="color: #dc3545;"></i>
+            <p>Error loading profile. Please try again.</p>
+            <button onclick="loadProfileData()" class="home-btn">Retry</button>
+          `;
+        }
+      }
+
+      function displayAssessments(assessments) {
+        const container = document.getElementById('assessmentsList');
+        
+        if (!assessments || assessments.length === 0) {
+          container.innerHTML = '<div class="no-data">No assessments taken yet. Take your first assessment!</div>';
+          return;
+        }
+
+        // Sort by date (newest first)
+        assessments.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        container.innerHTML = assessments.slice(0, 5).map(a => {
+          const severityClass = a.severity.toLowerCase().includes('minimal') ? 'severity-minimal' :
+                               a.severity.toLowerCase().includes('mild') ? 'severity-mild' :
+                               a.severity.toLowerCase().includes('moderate') ? 'severity-moderate' : 'severity-severe';
+          
+          return `
+            <div class="assessment-item">
+              <div>
+                <strong>${a.category.toUpperCase()}</strong>
+                <div style="font-size: 12px; color: #666;">${new Date(a.date).toLocaleDateString()}</div>
+              </div>
+              <div>
+                <span class="severity-badge ${severityClass}">${a.severity}</span>
+                <span style="margin-left: 10px;">Score: ${a.score}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function displayAppointments(appointments) {
+        const container = document.getElementById('appointmentsList');
+        
+        if (!appointments || appointments.length === 0) {
+          container.innerHTML = '<div class="no-data">No appointments scheduled. Book your first appointment!</div>';
+          return;
+        }
+
+        // Filter upcoming appointments
+        const today = new Date().toISOString().split('T')[0];
+        const upcoming = appointments.filter(a => a.date >= today).sort((a, b) => a.date.localeCompare(b.date));
+
+        if (upcoming.length === 0) {
+          container.innerHTML = '<div class="no-data">No upcoming appointments</div>';
+          return;
+        }
+
+        container.innerHTML = upcoming.slice(0, 3).map(a => `
+          <div class="appointment-item">
+            <div>
+              <strong>${a.student_name || 'Appointment'}</strong>
+              <div style="font-size: 12px; color: #666;">
+                ${a.date} at ${a.time} with ${a.counsellor}
+              </div>
+            </div>
+            <div>
+              <span class="status-${a.status}">● ${a.status}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
       function logout() {
-        localStorage.removeItem("currentUser");
+        // Clear user data
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('token');
+        
+        // Show logout message
+        alert("Logged out successfully!");
+        
+        // Redirect to login
         window.location.href = "login.html";
       }
     </script>

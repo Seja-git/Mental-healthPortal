@@ -8,6 +8,20 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap"
       rel="stylesheet"
     />
+    <script>
+// Add this to check if backend is available
+window.addEventListener('load', function() {
+    fetch('http://127.0.0.1:5000/')
+        .then(response => response.json())
+        .then(data => {
+            console.log('✅ Connected to backend:', data.message);
+        })
+        .catch(error => {
+            console.warn('⚠️ Backend not running on port 5000');
+            // Show warning but still allow localStorage fallback
+        });
+});
+</script>
     <style>
       body {
         font-family: "Poppins", sans-serif;

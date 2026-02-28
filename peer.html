@@ -26,6 +26,20 @@
       background
       same
     />
+    <script>
+// Add this to check if backend is available
+window.addEventListener('load', function() {
+    fetch('http://127.0.0.1:5000/')
+        .then(response => response.json())
+        .then(data => {
+            console.log('✅ Connected to backend:', data.message);
+        })
+        .catch(error => {
+            console.warn('⚠️ Backend not running on port 5000');
+            // Show warning but still allow localStorage fallback
+        });
+});
+</script>
     <style>
       body {
         margin: 0;
@@ -211,5 +225,123 @@
     <footer>
       <p>🌸 Moderated by College Peer Volunteers | Guided by Faculty Mentors</p>
     </footer>
+    <script>
+let currentPosts = [];
+
+// Load posts
+async function loadPosts() {
+    try {
+        const response = await fetch('http://localhost:5000/api/posts');
+        currentPosts = await response.json();
+        displayPosts();
+    } catch (error) {
+        // Use localStorage as fallback
+        currentPosts = JSON.parse(localStorage.getItem('forumPosts') || '[]');
+        displayPosts();
+    }
+}
+
+// Display posts
+function displayPosts() {
+    const postsContainer = document.getElementById('posts-container');
+    if (!postsContainer) return;
+    
+    postsContainer.innerHTML = currentPosts.map(post => `
+        <div class="post-card">
+            <div class="post-header">
+                <span class="post-author">${post.anonymous ? 'Anonymous' : post.author}</span>
+                <span class="post-date">${new Date(post.date).toLocaleDateString()}</span>
+            </div>
+            <div class="post-content">${post.content}</div>
+            <div class="post-actions">
+                <button onclick="likePost('${post.id}')">❤️ ${post.likes || 0}</button>
+                <button onclick="showComments('${post.id}')">💬 Comments</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Add new post
+document.querySelector('.post-form button').addEventListener('click', async function() {
+    const textarea = document.querySelector('.post-form textarea');
+    const content = textarea.value.trim();
+    
+    if (!content) return;
+    
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const newPost = {
+        id: Date.now().toString(),
+        author: user ? user.id : 'Anonymous',
+        anonymous: true,
+        content: content,
+        date: new Date().toISOString(),
+        likes: 0,
+        comments: []
+    };
+    
+    try {
+        await fetch('http://localhost:5000/api/posts', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(newPost)
+        });
+    } catch (error) {
+        // Save locally
+        currentPosts.unshift(newPost);
+        localStorage.setItem('forumPosts', JSON.stringify(currentPosts));
+    }
+    
+    textarea.value = '';
+    displayPosts();
+});
+
+loadPosts();
+</script>
+
+<style>
+.post-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    color: #666;
+}
+
+.post-author {
+    font-weight: bold;
+    color: #2b6777;
+}
+
+.post-content {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 15px 0;
+}
+
+.post-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.post-actions button {
+    background: none;
+    border: 1px solid #ddd;
+    padding: 5px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.post-actions button:hover {
+    background: #f0f0f0;
+}
+</style>
   </body>
 </html>

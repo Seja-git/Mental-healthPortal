@@ -8,11 +8,12 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
       body {
         margin: 0;
         font-family: "Poppins", sans-serif;
-        background: linear-gradient(to right, #a8edea, #fed6e3);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: #333;
         min-height: 100vh;
         display: flex;
@@ -26,7 +27,7 @@
         border-radius: 20px;
         width: 95%;
         max-width: 1100px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         display: grid;
         grid-template-columns: 2fr 1fr;
         gap: 2rem;
@@ -48,6 +49,20 @@
         color: #2b6777;
         margin-bottom: 1rem;
       }
+      .login-warning {
+        grid-column: span 2;
+        background: #fff3cd;
+        color: #856404;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        display: none;
+      }
+      .login-warning a {
+        color: #2b6777;
+        font-weight: bold;
+        text-decoration: none;
+      }
       form {
         display: flex;
         flex-direction: column;
@@ -56,16 +71,25 @@
       label {
         font-weight: 500;
         margin-bottom: 0.3rem;
+        color: #2b6777;
       }
       input,
       select,
       textarea {
         width: 100%;
         padding: 0.8rem;
-        border: 1px solid #ccc;
+        border: 2px solid #e0e0e0;
         border-radius: 10px;
         font-size: 0.95rem;
         font-family: "Poppins", sans-serif;
+        transition: all 0.3s;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #2b6777;
+        box-shadow: 0 0 0 3px rgba(43, 103, 119, 0.1);
       }
       textarea {
         resize: vertical;
@@ -95,11 +119,16 @@
         transition: 0.3s;
       }
       .btn-primary {
-        background: linear-gradient(to right, #ff85a2, #2b6777);
+        background: linear-gradient(135deg, #2b6777, #1e4d5a);
         color: #fff;
       }
-      .btn-primary:hover {
-        background: linear-gradient(to right, #ff4b5c, #1e4d5a);
+      .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      }
+      .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
       }
       .btn-secondary {
         background: #eee;
@@ -123,6 +152,26 @@
         margin: 0.6rem 0;
         line-height: 1.4;
       }
+      .counsellor-list {
+        max-height: 200px;
+        overflow-y: auto;
+        margin: 10px 0;
+      }
+      .counsellor-item {
+        padding: 10px;
+        margin: 5px 0;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .counsellor-item:hover {
+        background: #a8edea;
+      }
+      .counsellor-item.selected {
+        background: #2b6777;
+        color: white;
+      }
       .note {
         font-size: 0.85rem;
         color: #777;
@@ -136,6 +185,7 @@
         padding: 1.5rem;
         margin-top: 1rem;
         display: none;
+        text-align: center;
       }
       .confirmation h2 {
         margin: 0 0 1rem;
@@ -151,78 +201,95 @@
       .confirmation a:hover {
         text-decoration: underline;
       }
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #2b6777;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <h1>📅 Book an Appointment with a Counsellor</h1>
 
+      <!-- Login Warning -->
+      <div id="loginWarning" class="login-warning">
+        <i class="fas fa-info-circle"></i>
+        Please <a href="login.html">login</a> to book an appointment
+      </div>
+
       <!-- Appointment Form -->
       <form id="appointmentForm">
         <div class="row">
           <div>
-            <label for="fullname">Full Name</label>
+            <label for="fullname">Full Name *</label>
             <input type="text" id="fullname" required />
           </div>
           <div>
-            <label for="phone">Phone</label>
+            <label for="phone">Phone *</label>
             <input type="tel" id="phone" required />
           </div>
         </div>
 
         <div class="row">
           <div>
-            <label for="email">Email</label>
+            <label for="email">Email *</label>
             <input type="email" id="email" required />
           </div>
           <div>
-            <label for="mode">Mode</label>
-            <select id="mode">
-              <option>Online (Zoom / Meet)</option>
-              <option>In-person</option>
+            <label for="mode">Mode *</label>
+            <select id="mode" required>
+              <option value="">Select mode</option>
+              <option value="Online (Zoom / Meet)">Online (Zoom / Meet)</option>
+              <option value="In-person">In-person</option>
             </select>
           </div>
         </div>
 
         <div class="row">
           <div>
-            <label for="counsellor">Choose Counsellor</label>
+            <label for="counsellor">Choose Counsellor *</label>
             <select id="counsellor" required>
-              <option value="">-- Select --</option>
-              <option>Dr. Asha Patil (Student Stress)</option>
-              <option>Dr. Rajesh Sharma (Anxiety & Depression)</option>
-              <option>Ms. Sneha Kulkarni (Relationships)</option>
-              <option>Mr. Sameer Khan (Career Guidance)</option>
+              <option value="">-- Select Counsellor --</option>
             </select>
           </div>
           <div>
-            <label for="date">Date</label>
-            <input type="date" id="date" required />
+            <label for="date">Date *</label>
+            <input type="date" id="date" required min="" />
           </div>
         </div>
 
         <div class="row">
           <div>
-            <label for="time">Time</label>
+            <label for="time">Time *</label>
             <input type="time" id="time" required />
           </div>
           <div>
             <label for="duration">Duration</label>
             <select id="duration">
-              <option>30 minutes</option>
-              <option>45 minutes</option>
-              <option>60 minutes</option>
+              <option value="30 minutes">30 minutes</option>
+              <option value="45 minutes">45 minutes</option>
+              <option value="60 minutes">60 minutes</option>
             </select>
           </div>
         </div>
 
         <label for="notes">Brief Notes (optional)</label>
-        <textarea id="notes"></textarea>
+        <textarea id="notes" placeholder="Any specific concerns you'd like to discuss..."></textarea>
 
         <div class="actions">
           <button type="reset" class="btn btn-secondary">Clear</button>
-          <button type="submit" class="btn btn-primary">
-            Request Appointment
+          <button type="submit" class="btn btn-primary" id="submitBtn">
+            <span id="submitText">Request Appointment</span>
+            <span id="submitLoading" class="loading" style="display: none;"></span>
           </button>
         </div>
         <p class="note">Free — Confidential</p>
@@ -230,44 +297,211 @@
 
       <!-- Sidebar Info -->
       <div class="sidebar">
-        <h2>Campus Counselling</h2>
+        <h2><i class="fas fa-info-circle"></i> Campus Counselling</h2>
         <p>📍 Mon–Fri · 9:00–17:00</p>
         <p>☎ +91 22 1234 5678</p>
 
-        <h2>How it works</h2>
+        <h2>👥 Available Counsellors</h2>
+        <div id="counsellorList" class="counsellor-list">
+          <div class="loading"></div>
+        </div>
+
+        <h2>📋 How it works</h2>
         <p>✅ Pick a date that suits you.</p>
         <p>✅ Sessions are confidential and empathetic.</p>
-        <p>❌ Not for urgent crisis response.</p>
-
-        <h2>Quick Tips</h2>
-        <p>✍ Add 1–2 lines in notes to help the counsellor prepare.</p>
-        <p>📞 For urgent slots, call the helpline above.</p>
+        <p>✅ You'll receive a meeting link for online sessions.</p>
       </div>
 
       <!-- Confirmation Message -->
       <div id="confirmation" class="confirmation">
+        <i class="fas fa-check-circle" style="font-size: 50px; color: #28a745;"></i>
         <h2>✅ Appointment Confirmed!</h2>
-        <p>
-          Your session has been scheduled. Please check your email for details.
-        </p>
-        <p><b>Zoom Link:</b> <a href="#">https://zoom.us/j/123456789</a></p>
-        <p>
-          <b>Add to Google Calendar:</b>
-          <a href="https://calendar.google.com" target="_blank"> Click here </a>
-        </p>
+        <p id="confirmationDetails"></p>
+        <p><b>Meeting Link:</b> <a id="meetLink" href="#" target="_blank">Click here to join</a></p>
+        <p><b>Tracking ID:</b> <span id="trackingId"></span></p>
+        <button class="btn btn-primary" onclick="window.location.href='index.html'">
+          Return to Home
+        </button>
       </div>
     </div>
 
     <script>
-      const form = document.getElementById("appointmentForm");
-      const confirmation = document.getElementById("confirmation");
+      // Check login status on load
+      document.addEventListener('DOMContentLoaded', function() {
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        const token = localStorage.getItem('token');
+        const warning = document.getElementById('loginWarning');
+        const form = document.getElementById('appointmentForm');
+        
+        if (!user || !token) {
+          warning.style.display = 'block';
+          form.style.opacity = '0.5';
+          form.querySelectorAll('input, select, button[type="submit"]').forEach(el => {
+            el.disabled = true;
+          });
+        } else {
+          // Set min date to today
+          const today = new Date().toISOString().split('T')[0];
+          document.getElementById('date').min = today;
+          
+          // Load counsellors
+          loadCounsellors();
+        }
+      });
 
-      form.addEventListener("submit", function (e) {
+      // Load counsellors from backend
+      async function loadCounsellors() {
+        const counsellorSelect = document.getElementById('counsellor');
+        const counsellorList = document.getElementById('counsellorList');
+        
+        try {
+          const response = await fetch('http://127.0.0.1:5000/api/counsellors');
+          const counsellors = await response.json();
+          
+          // Populate select dropdown
+          counsellorSelect.innerHTML = '<option value="">-- Select Counsellor --</option>';
+          counsellors.forEach(c => {
+            counsellorSelect.innerHTML += `<option value="${c.name}">${c.name} - ${c.specialization}</option>`;
+          });
+          
+          // Populate sidebar list
+          counsellorList.innerHTML = '';
+          counsellors.forEach(c => {
+            counsellorList.innerHTML += `
+              <div class="counsellor-item" onclick="selectCounsellor('${c.name}')">
+                <i class="fas fa-user-md"></i>
+                <strong>${c.name}</strong><br>
+                <small>${c.specialization}</small>
+              </div>
+            `;
+          });
+        } catch (error) {
+          console.log('Using mock counsellors');
+          // Fallback to mock data
+          const mockCounsellors = [
+            { name: "Dr. Asha Patil", specialization: "Student Stress" },
+            { name: "Dr. Rajesh Sharma", specialization: "Anxiety & Depression" },
+            { name: "Ms. Sneha Kulkarni", specialization: "Relationships" },
+            { name: "Mr. Sameer Khan", specialization: "Career Guidance" }
+          ];
+          
+          mockCounsellors.forEach(c => {
+            counsellorSelect.innerHTML += `<option value="${c.name}">${c.name} - ${c.specialization}</option>`;
+            counsellorList.innerHTML += `
+              <div class="counsellor-item" onclick="selectCounsellor('${c.name}')">
+                <i class="fas fa-user-md"></i>
+                <strong>${c.name}</strong><br>
+                <small>${c.specialization}</small>
+              </div>
+            `;
+          });
+        }
+      }
+
+      function selectCounsellor(name) {
+        document.getElementById('counsellor').value = name;
+      }
+
+      // Handle form submission
+      document.getElementById("appointmentForm").addEventListener("submit", async function (e) {
         e.preventDefault();
-        form.style.display = "none"; // hide form
-        confirmation.style.display = "block"; // show confirmation
+        
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        const token = localStorage.getItem('token');
+        
+        if (!user || !token) {
+          alert("Please login to book an appointment");
+          window.location.href = "login.html";
+          return;
+        }
+
+        // Show loading state
+        const submitBtn = document.getElementById('submitBtn');
+        const submitText = document.getElementById('submitText');
+        const submitLoading = document.getElementById('submitLoading');
+        submitText.style.display = 'none';
+        submitLoading.style.display = 'inline-block';
+        submitBtn.disabled = true;
+
+        // Get form data
+        const formData = {
+          fullname: document.getElementById("fullname").value,
+          email: document.getElementById("email").value,
+          phone: document.getElementById("phone").value,
+          mode: document.getElementById("mode").value,
+          counsellor: document.getElementById("counsellor").value,
+          date: document.getElementById("date").value,
+          time: document.getElementById("time").value,
+          duration: document.getElementById("duration").value,
+          notes: document.getElementById("notes").value
+        };
+
+        // Validate all fields
+        for (let key in formData) {
+          if (!formData[key] && key !== 'notes') {
+            alert(`Please fill in ${key}`);
+            submitText.style.display = 'inline';
+            submitLoading.style.display = 'none';
+            submitBtn.disabled = false;
+            return;
+          }
+        }
+
+        try {
+          console.log('Sending appointment data:', formData);
+          
+          const response = await fetch('http://127.0.0.1:5000/api/appointments', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(formData)
+          });
+
+          const data = await response.json();
+          console.log('Response:', data);
+
+          if (response.ok) {
+            // Hide form, show confirmation
+            document.getElementById("appointmentForm").style.display = "none";
+            document.querySelector('.sidebar').style.display = "none";
+            
+            const confirmation = document.getElementById("confirmation");
+            confirmation.style.display = "block";
+            
+            // Set confirmation details
+            document.getElementById("confirmationDetails").innerHTML = `
+              <strong>${formData.fullname}</strong>, your appointment with <strong>${formData.counsellor}</strong><br>
+              on <strong>${formData.date} at ${formData.time}</strong>
+            `;
+            
+            if (data.meet_link) {
+              document.getElementById("meetLink").href = data.meet_link;
+              document.getElementById("meetLink").style.display = 'inline';
+            } else {
+              document.getElementById("meetLink").style.display = 'none';
+            }
+            
+            document.getElementById("trackingId").textContent = `APT${data.id}`;
+            
+            // Save to localStorage as backup
+            let appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+            appointments.push({...formData, id: data.id, status: 'pending'});
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+          } else {
+            alert("Booking failed: " + (data.error || "Unknown error"));
+          }
+        } catch (error) {
+          console.error('Booking error:', error);
+          alert("Cannot connect to server. Please make sure backend is running on port 5000");
+        } finally {
+          // Reset button state
+          submitText.style.display = 'inline';
+          submitLoading.style.display = 'none';
+          submitBtn.disabled = false;
+        }
       });
     </script>
   </body>
 </html>
-

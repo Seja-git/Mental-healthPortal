@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>HealMate Chatbot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
       body {
         font-family: "Segoe UI", sans-serif;
@@ -11,14 +12,9 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background: linear-gradient(
-          to right,
-          #a8edea,
-          #fed6e3
-        ); /* cyan → pink gradient */
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       }
 
-      /* Chat Container */
       .chat-container {
         background: #ffffff;
         width: 95%;
@@ -27,111 +23,227 @@
         display: flex;
         flex-direction: column;
         border-radius: 20px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         overflow: hidden;
+        position: relative;
       }
 
-      /* Header */
       header {
-        background: linear-gradient(
-          to right,
-          #ff4b5c,
-          #2b6777
-        ); /* pink + teal mix */
+        background: linear-gradient(135deg, #2b6777, #1e4d5a);
         color: white;
-        padding: 15px;
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
       }
 
-      /* Chat Box */
+      header i {
+        font-size: 30px;
+      }
+
+      header h2 {
+        margin: 0;
+        font-size: 1.3rem;
+      }
+
+      header p {
+        margin: 0;
+        font-size: 0.8rem;
+        opacity: 0.9;
+      }
+
       .chat-box {
         flex: 1;
-        padding: 15px;
+        padding: 20px;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        background: #fefaff; /* very soft pink background */
+        gap: 15px;
+        background: #f8f9fa;
       }
 
-      /* Messages */
       .message {
         padding: 12px 16px;
         border-radius: 18px;
-        max-width: 75%;
-        font-size: 15px;
-        line-height: 1.4;
+        max-width: 80%;
+        font-size: 14px;
+        line-height: 1.5;
         animation: fadeIn 0.3s ease;
+        position: relative;
       }
 
       .message.user {
         align-self: flex-end;
-        background: #ff85a2; /* pink bubble */
+        background: linear-gradient(135deg, #2b6777, #1e4d5a);
         color: #fff;
         border-bottom-right-radius: 4px;
       }
 
       .message.bot {
         align-self: flex-start;
-        background: #c9f7f5; /* cyan bubble */
+        background: white;
         color: #333;
         border-bottom-left-radius: 4px;
-        border: 1px solid #b2ece9;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       }
 
-      /* Input Area */
+      .message.bot::before {
+        content: '🤖';
+        position: absolute;
+        left: -25px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+      }
+
+      .typing {
+        align-self: flex-start;
+        background: white;
+        padding: 12px 16px;
+        border-radius: 18px;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      }
+
+      .typing .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #2b6777;
+        margin: 0 2px;
+        animation: bounce 1.4s infinite;
+      }
+
+      .typing .dot:nth-child(2) { animation-delay: 0.2s; }
+      .typing .dot:nth-child(3) { animation-delay: 0.4s; }
+
+      @keyframes bounce {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-10px); }
+      }
+
       .chat-input {
         display: flex;
         align-items: center;
-        padding: 10px;
-        border-top: 1px solid #ddd;
-        background: #fff;
+        padding: 15px;
+        background: white;
+        border-top: 1px solid #eee;
+        gap: 10px;
       }
 
       .chat-input input {
         flex: 1;
-        padding: 14px 45px 14px 40px;
-        border: 1px solid #ccc;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
         border-radius: 25px;
-        font-size: 15px;
+        font-size: 14px;
         outline: none;
+        transition: all 0.3s;
+        font-family: inherit;
       }
 
-      /* Attachment Button */
-      .attach-btn {
-        position: absolute;
-        margin-left: 15px;
+      .chat-input input:focus {
+        border-color: #2b6777;
+        box-shadow: 0 0 0 3px rgba(43, 103, 119, 0.1);
+      }
+
+      .chat-input button {
+        width: 45px;
+        height: 45px;
+        border: none;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2b6777, #1e4d5a);
+        color: white;
         font-size: 18px;
+        cursor: pointer;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .chat-input button:hover:not(:disabled) {
+        transform: scale(1.1);
+        box-shadow: 0 5px 15px rgba(43, 103, 119, 0.4);
+      }
+
+      .chat-input button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .quick-replies {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 10px 15px;
+        background: #f8f9fa;
+        border-top: 1px solid #eee;
+      }
+
+      .quick-reply {
+        padding: 8px 15px;
+        background: white;
+        border: 1px solid #2b6777;
+        border-radius: 20px;
+        font-size: 12px;
         color: #2b6777;
         cursor: pointer;
-      }
-
-      /* Send Button */
-      .send-btn {
-        position: absolute;
-        right: 25px;
-        font-size: 18px;
-        color: white;
-        background: #ff4b5c; /* strong pink */
-        border-radius: 50%;
-        padding: 8px 12px;
-        cursor: pointer;
-        border: none;
         transition: 0.3s;
       }
-      .send-btn:hover {
-        background: #e0434c;
+
+      .quick-reply:hover {
+        background: #2b6777;
+        color: white;
       }
 
-      /* Input Wrapper */
-      .input-wrapper {
-        position: relative;
-        flex: 1;
+      .crisis-alert {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #ff4b5c;
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        z-index: 1000;
+        max-width: 90%;
+        width: 400px;
+        animation: slideUp 0.3s ease;
       }
 
-      /* Animation */
+      .crisis-alert h3 {
+        margin: 0 0 10px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .crisis-alert button {
+        margin-top: 15px;
+        padding: 8px 20px;
+        background: white;
+        color: #ff4b5c;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+        width: 100%;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translate(-50%, 20px);
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, 0);
+        }
+      }
+
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -142,117 +254,256 @@
           transform: translateY(0);
         }
       }
+
+      .connection-status {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 10px;
+        padding: 3px 8px;
+        border-radius: 10px;
+        background: #28a745;
+        color: white;
+      }
+
+      .connection-status.offline {
+        background: #dc3545;
+      }
     </style>
   </head>
   <body>
     <div class="chat-container">
-      <!-- Header -->
-      <header>🤖 HealMate</header>
+      <header>
+        <i class="fas fa-robot"></i>
+        <div>
+          <h2>HealMate AI</h2>
+          <p>Your mental wellness companion</p>
+        </div>
+        <div id="connectionStatus" class="connection-status">● Connected</div>
+      </header>
 
-      <!-- Chat Messages -->
       <div id="chat-box" class="chat-box">
         <div class="message bot">
-          Hello 👋 I'm HealMate. How are you feeling today?
+          Hello 👋 I'm HealMate. I'm here to listen and support you. How are you feeling today?
         </div>
       </div>
 
-      <!-- Input -->
+      <div class="quick-replies" id="quickReplies">
+        <span class="quick-reply" onclick="sendQuickReply('I feel sad')">😔 Feeling sad</span>
+        <span class="quick-reply" onclick="sendQuickReply('I feel anxious')">😰 Feeling anxious</span>
+        <span class="quick-reply" onclick="sendQuickReply('I feel stressed')">😫 Feeling stressed</span>
+        <span class="quick-reply" onclick="sendQuickReply('I need help')">🆘 Need help</span>
+      </div>
+
       <div class="chat-input">
-        <div class="input-wrapper">
-          <span class="attach-btn">📎</span>
-          <input
-            type="text"
-            id="user-input"
-            placeholder="Type your message here..."
-          />
-          <button class="send-btn" onclick="sendMessage()">➤</button>
-        </div>
+        <input
+          type="text"
+          id="user-input"
+          placeholder="Type your message here..."
+          onkeypress="if(event.key === 'Enter') sendMessage()"
+        />
+        <button onclick="sendMessage()" id="sendBtn">
+          <i class="fas fa-paper-plane"></i>
+        </button>
       </div>
     </div>
 
     <script>
-      // Predefined bot replies
-      const responses = {
-        hi: ["Hello there! 🌸", "Hi! How are you feeling today?"],
-        sad: [
-          "I'm sorry to hear that 💙. Do you want to talk about it?",
-          "Sometimes feeling sad is okay 🌧, I'm here with you.",
-          "Sending you a virtual hug 🤗",
-        ],
-        happy: [
-          "Yay! 🎉 I'm so glad you're happy!",
-          "That’s wonderful 😊 keep smiling!",
-          "Happiness is contagious 💛 thanks for sharing!",
-        ],
-        stress: [
-          "Stress can be tough 😔. Want me to guide you through a quick breathing exercise?",
-          "I hear you 💚 Stress happens, but we can handle it together.",
-          "Let's try a small relaxation activity 🌿",
-        ],
-        default: [
-          "Thanks for sharing 💚",
-          "I’m listening 👂 tell me more!",
-          "Would you like to take a quick stress test?",
-        ],
-      };
+      let typingIndicator = null;
+      let isSending = false;
 
-      function sendMessage() {
-        let input = document.getElementById("user-input");
-        let chatBox = document.getElementById("chat-box");
-        let text = input.value.trim().toLowerCase();
-
-        if (text !== "") {
-          // User message
-          let userMsg = document.createElement("div");
-          userMsg.className = "message user";
-          userMsg.textContent = input.value;
-          chatBox.appendChild(userMsg);
-
-          // Bot "typing..."
-          let typingMsg = document.createElement("div");
-          typingMsg.className = "message bot";
-          typingMsg.textContent = "⏳ typing...";
-          chatBox.appendChild(typingMsg);
-          chatBox.scrollTop = chatBox.scrollHeight;
-
-          // Bot response
-          setTimeout(() => {
-            chatBox.removeChild(typingMsg);
-
-            let botMsg = document.createElement("div");
-            botMsg.className = "message bot";
-
-            // Choose response
-            if (text.includes("hi") || text.includes("hello")) {
-              botMsg.textContent =
-                responses.hi[Math.floor(Math.random() * responses.hi.length)];
-            } else if (text.includes("sad")) {
-              botMsg.textContent =
-                responses.sad[Math.floor(Math.random() * responses.sad.length)];
-            } else if (text.includes("happy")) {
-              botMsg.textContent =
-                responses.happy[
-                  Math.floor(Math.random() * responses.happy.length)
-                ];
-            } else if (text.includes("stress")) {
-              botMsg.textContent =
-                responses.stress[
-                  Math.floor(Math.random() * responses.stress.length)
-                ];
-            } else {
-              botMsg.textContent =
-                responses.default[
-                  Math.floor(Math.random() * responses.default.length)
-                ];
-            }
-
-            chatBox.appendChild(botMsg);
-            chatBox.scrollTop = chatBox.scrollHeight;
-          }, 1000);
-
-          input.value = "";
+      // Check connection to backend
+      async function checkConnection() {
+        const status = document.getElementById('connectionStatus');
+        try {
+          await fetch('http://127.0.0.1:5000/');
+          status.className = 'connection-status';
+          status.textContent = '● Connected';
+        } catch {
+          status.className = 'connection-status offline';
+          status.textContent = '● Offline (using local)';
         }
       }
+      checkConnection();
+      setInterval(checkConnection, 30000); // Check every 30 seconds
+
+      function addMessage(text, sender) {
+        const chatBox = document.getElementById('chat-box');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${sender}`;
+        msgDiv.textContent = text;
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return msgDiv;
+      }
+
+      function showTypingIndicator() {
+        const chatBox = document.getElementById('chat-box');
+        typingIndicator = document.createElement('div');
+        typingIndicator.className = 'typing';
+        typingIndicator.id = 'typing-indicator';
+        typingIndicator.innerHTML = `
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        `;
+        chatBox.appendChild(typingIndicator);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+
+      function removeTypingIndicator() {
+        if (typingIndicator) {
+          typingIndicator.remove();
+          typingIndicator = null;
+        }
+      }
+
+      async function sendMessage() {
+        const input = document.getElementById('user-input');
+        const text = input.value.trim();
+        
+        if (text === '' || isSending) return;
+        
+        await processMessage(text);
+        input.value = '';
+      }
+
+      async function sendQuickReply(text) {
+        if (isSending) return;
+        await processMessage(text);
+      }
+
+      async function processMessage(text) {
+        isSending = true;
+        document.getElementById('sendBtn').disabled = true;
+        
+        // Add user message
+        addMessage(text, 'user');
+        
+        // Show typing indicator
+        showTypingIndicator();
+        
+        try {
+          // Try to get response from backend
+          const response = await fetch('http://127.0.0.1:5000/api/chat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              message: text,
+              user_id: JSON.parse(localStorage.getItem('currentUser'))?.id 
+            })
+          });
+          
+          const data = await response.json();
+          
+          // Remove typing indicator
+          removeTypingIndicator();
+          
+          // Add bot response
+          addMessage(data.response, 'bot');
+          
+          // Check for crisis
+          if (data.crisis_detected) {
+            showCrisisAlert();
+          }
+          
+          // Save conversation to localStorage
+          saveConversation(text, data.response);
+          
+        } catch (error) {
+          console.log('Using local fallback responses');
+          removeTypingIndicator();
+          
+          // Local fallback responses
+          let response = getLocalResponse(text);
+          addMessage(response, 'bot');
+          saveConversation(text, response);
+        }
+        
+        isSending = false;
+        document.getElementById('sendBtn').disabled = false;
+      }
+
+      function getLocalResponse(message) {
+        const text = message.toLowerCase();
+        
+        if (text.includes('suicide') || text.includes('kill myself') || text.includes('die')) {
+          showCrisisAlert();
+          return "🚨 I'm very concerned. Please call NIMHANS Helpline: 080-46110007 immediately.";
+        }
+        else if (text.includes('sad') || text.includes('depressed')) {
+          return "I hear that you're feeling sad. Would you like to take a PHQ-9 depression screening? You can find it in the Self-Assessment section.";
+        }
+        else if (text.includes('anxious') || text.includes('nervous') || text.includes('worry')) {
+          return "Anxiety can be challenging. Let's try a quick breathing exercise: Breathe in for 4 seconds, hold for 4, out for 6. Want to try it together?";
+        }
+        else if (text.includes('stress')) {
+          return "Stress is common among students. Quick tips: break tasks into smaller steps, take short breaks, and talk to someone. Check our Resource Hub for more help.";
+        }
+        else if (text.includes('hello') || text.includes('hi')) {
+          return "Hello! 👋 I'm here to support you. How are you feeling today?";
+        }
+        else if (text.includes('thank')) {
+          return "You're welcome! 💙 I'm always here when you need someone to talk to.";
+        }
+        else {
+          return "I'm here to listen. Would you like to:\n• Talk about how you're feeling\n• Take a mental health screening\n• Learn some coping strategies\n• Book a counselor appointment";
+        }
+      }
+
+      function saveConversation(userMsg, botMsg) {
+        let history = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+        history.push({
+          user: userMsg,
+          bot: botMsg,
+          timestamp: new Date().toISOString()
+        });
+        // Keep only last 50 messages
+        if (history.length > 50) history = history.slice(-50);
+        localStorage.setItem('chatHistory', JSON.stringify(history));
+      }
+
+      function showCrisisAlert() {
+        // Check if alert already exists
+        if (document.querySelector('.crisis-alert')) return;
+        
+        const alert = document.createElement('div');
+        alert.className = 'crisis-alert';
+        alert.innerHTML = `
+          <h3><i class="fas fa-exclamation-triangle"></i> Immediate Help Available</h3>
+          <p>You've mentioned thoughts of self-harm. Please reach out now:</p>
+          <p><strong>🇮🇳 NIMHANS Helpline:</strong> 080-46110007</p>
+          <p><strong>🇮🇳 AIIMS Helpline:</strong> 011-26588588</p>
+          <p><strong>Emergency:</strong> 112</p>
+          <button onclick="this.parentElement.remove()">I Understand</button>
+        `;
+        document.body.appendChild(alert);
+        
+        // Auto-remove after 30 seconds
+        setTimeout(() => {
+          if (alert.parentElement) alert.remove();
+        }, 30000);
+      }
+
+      // Load chat history
+      function loadChatHistory() {
+        const history = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+        const chatBox = document.getElementById('chat-box');
+        
+        // Clear welcome message if there's history
+        if (history.length > 0) {
+          chatBox.innerHTML = '';
+          history.forEach(msg => {
+            addMessage(msg.user, 'user');
+            addMessage(msg.bot, 'bot');
+          });
+        }
+      }
+      
+      // Optionally load history
+      // loadChatHistory();
     </script>
   </body>
 </html>

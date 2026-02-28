@@ -3,15 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <title>Student Wellness Check</title>
+    <script>
+// Add this to check if backend is available
+window.addEventListener('load', function() {
+    fetch('http://127.0.0.1:5000/')
+        .then(response => response.json())
+        .then(data => {
+            console.log('✅ Connected to backend:', data.message);
+        })
+        .catch(error => {
+            console.warn('⚠️ Backend not running on port 5000');
+            // Show warning but still allow localStorage fallback
+        });
+});
+</script>
     <style>
       body {
         font-family: "Segoe UI", sans-serif;
         margin: 0;
-        background: linear-gradient(
-          to right,
-          #a8edea,
-          #fed6e3
-        ); /* cyan → pink */
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         min-height: 100vh;
         display: flex;
         justify-content: center;
@@ -22,46 +32,54 @@
       .container {
         background: #fff;
         width: 95%;
-        max-width: 850px;
-        padding: 25px 30px;
+        max-width: 900px;
+        padding: 30px;
         border-radius: 20px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       }
 
       h1 {
         text-align: center;
         color: #2b6777;
         margin-bottom: 20px;
+        font-size: 2.2rem;
       }
 
-      /* ✅ Force exactly 3 columns */
+      .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+      }
+
       .menu {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 15px;
-        justify-items: center;
+        margin-bottom: 30px;
       }
 
       .menu button {
-        background: linear-gradient(
-          to right,
-          #ff85a2,
-          #2b6777
-        ); /* pink + teal */
-        color: #fff;
+        background: linear-gradient(135deg, #a8edea, #fed6e3);
+        color: #2b6777;
         border: none;
         border-radius: 15px;
-        padding: 15px 25px;
+        padding: 20px;
         font-size: 16px;
+        font-weight: bold;
         cursor: pointer;
         transition: 0.3s;
-        width: 100%;
-        max-width: 220px;
-        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
       }
 
       .menu button:hover {
-        background: linear-gradient(to right, #ff4b5c, #1e4d5a);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      }
+
+      .menu button i {
+        display: block;
+        font-size: 30px;
+        margin-bottom: 10px;
       }
 
       .quiz {
@@ -69,111 +87,338 @@
         margin-top: 20px;
       }
 
-      .question {
-        margin: 20px 0;
+      .quiz-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
         padding: 15px;
-        border-left: 5px solid #a8edea; /* cyan highlight */
-        background: #fef6f9; /* very light pink */
+        background: #f8f9fa;
         border-radius: 10px;
       }
 
-      .options {
-        margin-top: 10px;
+      .progress-bar {
+        width: 100%;
+        height: 10px;
+        background: #e0e0e0;
+        border-radius: 5px;
+        margin: 20px 0;
+        overflow: hidden;
       }
 
-      label {
-        display: block;
-        margin: 6px 0;
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #a8edea, #fed6e3);
+        transition: width 0.3s ease;
+      }
+
+      .question {
+        margin: 20px 0;
+        padding: 20px;
+        border-left: 5px solid #a8edea;
+        background: #fef6f9;
+        border-radius: 10px;
+        animation: fadeIn 0.5s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .options label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
         cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .options label:hover {
+        background: #a8edea;
+        border-color: #2b6777;
       }
 
       button.submit {
-        display: block;
         width: 100%;
-        padding: 12px;
+        padding: 15px;
         margin-top: 20px;
         border: none;
         border-radius: 25px;
-        background: #ff4b5c; /* strong pink */
+        background: linear-gradient(135deg, #2b6777, #1e4d5a);
         color: white;
-        font-size: 16px;
+        font-size: 18px;
         font-weight: bold;
         cursor: pointer;
         transition: 0.3s;
       }
 
-      button.submit:hover {
-        background: #d63447;
+      button.submit:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      }
+
+      button.submit:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
       }
 
       .result {
         margin-top: 25px;
-        padding: 20px;
+        padding: 25px;
         border-radius: 15px;
         text-align: center;
         font-size: 18px;
         font-weight: bold;
         display: none;
+        animation: slideUp 0.5s ease;
       }
 
-      .low {
-        background: #d9fdd3;
-        color: #2b6777;
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
-      .moderate {
-        background: #fff3cd;
-        color: #444;
-      }
-
-      .high {
-        background: #f8d7da;
-        color: #ff4b56;
-      }
+      .low { background: #d9fdd3; color: #2b6777; }
+      .moderate { background: #fff3cd; color: #856404; }
+      .high { background: #f8d7da; color: #721c24; }
 
       .back {
         margin-top: 20px;
-        background: #2b6777; /* teal */
+        background: #6c757d;
         color: #fff;
         border: none;
         border-radius: 10px;
-        padding: 10px 15px;
+        padding: 12px 20px;
         cursor: pointer;
+        transition: 0.3s;
       }
 
       .back:hover {
-        background: #1e4d5a;
+        background: #5a6268;
+      }
+
+      .recommendations {
+        margin-top: 20px;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        text-align: left;
+      }
+
+      .recommendations h4 {
+        color: #2b6777;
+        margin-bottom: 10px;
+      }
+
+      .recommendations ul {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      .recommendations li {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .recommendations li:last-child {
+        border-bottom: none;
+      }
+
+      .recommendations i {
+        color: #2b6777;
+        margin-right: 10px;
+      }
+
+      .crisis-alert {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        z-index: 1000;
+        max-width: 400px;
+        text-align: center;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% { box-shadow: 0 20px 60px rgba(255, 75, 92, 0.3); }
+        50% { box-shadow: 0 20px 60px rgba(255, 75, 92, 0.6); }
+        100% { box-shadow: 0 20px 60px rgba(255, 75, 92, 0.3); }
+      }
+
+      .alert-content i {
+        font-size: 50px;
+        color: #ff4b5c;
+        margin-bottom: 20px;
+      }
+
+      .alert-content button {
+        margin-top: 20px;
+        padding: 10px 30px;
+        background: #ff4b5c;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .alert-content button:hover {
+        background: #d63447;
+      }
+
+      .login-prompt {
+        text-align: center;
+        padding: 20px;
+        background: #fff3cd;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: none;
+      }
+
+      .login-prompt a {
+        color: #2b6777;
+        font-weight: bold;
+        text-decoration: none;
       }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   </head>
   <body>
     <div class="container">
       <h1>🌸 Student Wellness Check</h1>
+      <p class="subtitle">Clinical-grade screening tools (PHQ-9 & GAD-7)</p>
+
+      <!-- Login Prompt (shown if not logged in) -->
+      <div id="loginPrompt" class="login-prompt">
+        <i class="fas fa-info-circle"></i>
+        Please <a href="login.html">login</a> to save your assessment results
+      </div>
 
       <!-- Main Menu -->
       <div id="menu" class="menu">
-        <button onclick="openQuiz('anxiety')">Anxiety</button>
-        <button onclick="openQuiz('academic')">Academic Pressure</button>
-        <button onclick="openQuiz('depression')">Depression</button>
-        <button onclick="openQuiz('addiction')">Addiction</button>
-        <button onclick="openQuiz('stress')">Stress</button>
-        <button onclick="openQuiz('loneliness')">Loneliness</button>
+        <button onclick="openQuiz('phq9')">
+          <i class="fas fa-heart-broken"></i>
+          PHQ-9<br>Depression Screening
+        </button>
+        <button onclick="openQuiz('gad7')">
+          <i class="fas fa-brain"></i>
+          GAD-7<br>Anxiety Screening
+        </button>
+        <button onclick="openQuiz('stress')">
+          <i class="fas fa-bolt"></i>
+          Stress Assessment
+        </button>
+        <button onclick="openQuiz('sleep')">
+          <i class="fas fa-moon"></i>
+          Sleep Quality
+        </button>
       </div>
 
       <!-- Quiz Section -->
       <div id="quizSection" class="quiz">
+        <div class="quiz-header">
+          <h2 id="quizTitle"></h2>
+          <span id="questionCounter">Question 1/9</span>
+        </div>
+        
+        <div class="progress-bar">
+          <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+        </div>
+
         <form id="quizForm"></form>
-        <button type="button" class="submit" onclick="calculateResult()">
-          Submit
+        
+        <button type="button" class="submit" onclick="calculateResult()" id="submitBtn" disabled>
+          Submit Assessment
         </button>
+        
         <div id="result" class="result"></div>
-        <button class="back" onclick="goBack()">⬅ Back to Menu</button>
+        
+        <button class="back" onclick="goBack()">
+          <i class="fas fa-arrow-left"></i> Back to Menu
+        </button>
       </div>
     </div>
 
     <script>
-      const quizzes = {
-        anxiety: {
+      // Check login status on load
+      document.addEventListener('DOMContentLoaded', function() {
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        const prompt = document.getElementById('loginPrompt');
+        if (!user) {
+          prompt.style.display = 'block';
+        }
+      });
+
+      const clinicalQuizzes = {
+        phq9: {
+          name: "PHQ-9 Depression Screening",
+          description: "Over the last 2 weeks, how often have you been bothered by...",
+          questions: [
+            "Little interest or pleasure in doing things?",
+            "Feeling down, depressed, or hopeless?",
+            "Trouble falling/staying asleep, sleeping too much?",
+            "Feeling tired or having little energy?",
+            "Poor appetite or overeating?",
+            "Feeling bad about yourself — or that you are a failure?",
+            "Trouble concentrating on things, such as reading or watching TV?",
+            "Moving or speaking so slowly that others could notice?",
+            "Thoughts that you would be better off dead or hurting yourself?"
+          ],
+          recommendations: {
+            minimal: [
+              "Continue maintaining healthy habits",
+              "Practice self-care activities",
+              "Connect with friends and family"
+            ],
+            mild: [
+              "Try guided meditation or mindfulness",
+              "Exercise regularly (30 mins daily)",
+              "Talk to a trusted friend or peer volunteer"
+            ],
+            moderate: [
+              "Consider speaking with a counselor",
+              "Join peer support groups",
+              "Use our self-help resources"
+            ],
+            severe: [
+              "Please consult a mental health professional",
+              "Contact helpline: NIMHANS 080-46110007",
+              "Visit the nearest hospital if thoughts of self-harm"
+            ]
+          }
+        },
+        gad7: {
+          name: "GAD-7 Anxiety Screening",
+          description: "Over the last 2 weeks, how often have you been bothered by...",
           questions: [
             "Feeling nervous, anxious, or on edge?",
             "Not being able to stop or control worrying?",
@@ -181,61 +426,60 @@
             "Trouble relaxing?",
             "Being so restless that it's hard to sit still?",
             "Becoming easily annoyed or irritable?",
-            "Feeling afraid, as if something awful might happen?",
+            "Feeling afraid as if something awful might happen?"
           ],
-        },
-        depression: {
-          questions: [
-            "Little interest or pleasure in doing things?",
-            "Feeling down, depressed, or hopeless?",
-            "Trouble falling or staying asleep, or sleeping too much?",
-            "Feeling tired or having little energy?",
-            "Poor appetite or overeating?",
-            "Feeling bad about yourself — or that you are a failure?",
-            "Trouble concentrating on things, such as reading or watching TV?",
-            "Moving or speaking slowly — or being fidgety/restless?",
-            "Thoughts that you would be better off dead, or of hurting yourself?",
-          ],
-        },
-        academic: {
-          questions: [
-            "Feeling overwhelmed by academic workload?",
-            "Difficulty concentrating on studies due to stress?",
-            "Trouble meeting deadlines or assignments?",
-            "Comparing yourself negatively with classmates?",
-            "Losing interest in studies because of pressure?",
-          ],
-        },
-        addiction: {
-          questions: [
-            "Spending too much time on gaming, social media, or internet?",
-            "Using substances (alcohol, caffeine, smoking) more than intended?",
-            "Neglecting responsibilities due to addictive habits?",
-            "Feeling restless or irritated when unable to engage in the habit?",
-            "Trying to cut down but failing repeatedly?",
-          ],
+          recommendations: {
+            minimal: [
+              "Practice deep breathing exercises",
+              "Maintain regular sleep schedule",
+              "Limit caffeine intake"
+            ],
+            mild: [
+              "Try progressive muscle relaxation",
+              "Use our guided meditation videos",
+              "Join stress management workshop"
+            ],
+            moderate: [
+              "Consider counseling sessions",
+              "Learn CBT techniques",
+              "Join anxiety support group"
+            ],
+            severe: [
+              "Professional help recommended",
+              "Contact mental health services",
+              "Emergency: 911 if in crisis"
+            ]
+          }
         },
         stress: {
+          name: "Perceived Stress Scale",
           questions: [
-            "Feeling overwhelmed with daily tasks?",
-            "Trouble sleeping due to overthinking?",
-            "Feeling easily irritated or short-tempered?",
-            "Struggling to manage multiple responsibilities?",
-            "Difficulty relaxing or calming down?",
-          ],
+            "Been upset because of something that happened unexpectedly?",
+            "Felt unable to control important things in life?",
+            "Felt nervous and stressed?",
+            "Felt confident about handling personal problems?",
+            "Felt things were going your way?",
+            "Found you could not cope with all you had to do?",
+            "Been able to control irritations in life?",
+            "Felt you were on top of things?",
+            "Been angered because of things outside your control?",
+            "Felt difficulties were piling up so high you could not overcome them?"
+          ]
         },
-        loneliness: {
+        sleep: {
+          name: "Sleep Quality Assessment",
           questions: [
-            "Feeling left out frequently?",
-            "Lacking companionship or close relationships?",
-            "Feeling isolated from people around you?",
-            "Thinking no one truly understands you?",
-            "Wishing for more people to spend time with?",
-          ],
-        },
+            "How long does it take you to fall asleep?",
+            "How many times do you wake up at night?",
+            "Do you feel rested when you wake up?",
+            "Do you take sleeping pills?",
+            "Do you feel sleepy during the day?"
+          ]
+        }
       };
 
       let currentQuiz = "";
+      let currentAnswers = [];
 
       function openQuiz(type) {
         currentQuiz = type;
@@ -243,61 +487,238 @@
         const quizSection = document.getElementById("quizSection");
         quizSection.style.display = "block";
 
+        document.getElementById("quizTitle").innerHTML = clinicalQuizzes[type].name;
+        
         let form = document.getElementById("quizForm");
         form.innerHTML = "";
+        currentAnswers = new Array(clinicalQuizzes[type].questions.length).fill(null);
 
-        quizzes[type].questions.forEach((q, index) => {
+        clinicalQuizzes[type].questions.forEach((q, index) => {
           let div = document.createElement("div");
           div.classList.add("question");
           div.innerHTML = `
-          <p>${index + 1}. ${q}</p>
-          <div class="options">
-            <label><input type="radio" name="q${index}" value="0"> Not at all</label>
-            <label><input type="radio" name="q${index}" value="1"> Several days</label>
-            <label><input type="radio" name="q${index}" value="2"> More than half the days</label>
-            <label><input type="radio" name="q${index}" value="3"> Nearly every day</label>
-          </div>
-        `;
+            <p><strong>${index + 1}. ${q}</strong></p>
+            <div class="options">
+              <label><input type="radio" name="q${index}" value="0" onchange="saveAnswer(${index}, 0)"> Not at all</label>
+              <label><input type="radio" name="q${index}" value="1" onchange="saveAnswer(${index}, 1)"> Several days</label>
+              <label><input type="radio" name="q${index}" value="2" onchange="saveAnswer(${index}, 2)"> More than half the days</label>
+              <label><input type="radio" name="q${index}" value="3" onchange="saveAnswer(${index}, 3)"> Nearly every day</label>
+            </div>
+          `;
           form.appendChild(div);
         });
+
+        updateProgress();
       }
 
-      function calculateResult() {
-        let form = document.getElementById("quizForm");
-        let inputs = form.querySelectorAll("input[type=radio]:checked");
-        let totalQuestions = quizzes[currentQuiz].questions.length;
+      function saveAnswer(index, value) {
+        currentAnswers[index] = value;
+        updateProgress();
+        
+        // Auto-scroll to next unanswered question
+        const nextUnanswered = currentAnswers.findIndex(a => a === null);
+        if (nextUnanswered !== -1 && nextUnanswered > index) {
+          const nextQuestion = document.querySelectorAll('.question')[nextUnanswered];
+          nextQuestion.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
 
-        if (inputs.length < totalQuestions) {
+      function updateProgress() {
+        const answered = currentAnswers.filter(a => a !== null).length;
+        const total = currentAnswers.length;
+        const progress = (answered / total) * 100;
+        
+        document.getElementById('progressFill').style.width = progress + '%';
+        document.getElementById('questionCounter').innerHTML = 
+          `Question ${answered}/${total}`;
+        
+        // Enable submit if all answered
+        document.getElementById('submitBtn').disabled = answered < total;
+      }
+
+      async function calculateResult() {
+        if (currentAnswers.includes(null)) {
           alert("⚠ Please answer all questions before submitting.");
           return;
         }
 
-        let total = 0;
-        inputs.forEach((i) => (total += parseInt(i.value)));
+        const total = currentAnswers.reduce((a, b) => a + b, 0);
+        const maxScore = currentAnswers.length * 3;
+        const percentage = (total / maxScore) * 100;
 
+        let severity = "";
+        let recommendations = [];
+
+        if (currentQuiz === 'phq9') {
+          if (total <= 4) severity = "Minimal depression";
+          else if (total <= 9) severity = "Mild depression";
+          else if (total <= 14) severity = "Moderate depression";
+          else if (total <= 19) severity = "Moderately severe depression";
+          else severity = "Severe depression";
+          
+          recommendations = getRecommendations('phq9', total);
+        } 
+        else if (currentQuiz === 'gad7') {
+          if (total <= 4) severity = "Minimal anxiety";
+          else if (total <= 9) severity = "Mild anxiety";
+          else if (total <= 14) severity = "Moderate anxiety";
+          else severity = "Severe anxiety";
+          
+          recommendations = getRecommendations('gad7', total);
+        }
+        else {
+          if (percentage < 33) severity = "Low";
+          else if (percentage < 66) severity = "Moderate";
+          else severity = "High";
+        }
+
+        // Save assessment to backend
+        await saveAssessment(currentQuiz, total, severity, currentAnswers);
+
+        // Show result
         let resultBox = document.getElementById("result");
         resultBox.style.display = "block";
-
-        if (total <= totalQuestions * 0.33) {
+        
+        if (severity.includes("Minimal") || severity === "Low") {
           resultBox.className = "result low";
-          resultBox.textContent =
-            "✅ Low symptoms detected. You're managing well. Keep taking care of yourself 🌱";
-        } else if (total <= totalQuestions * 0.66) {
+        } else if (severity.includes("Mild") || severity === "Moderate") {
           resultBox.className = "result moderate";
-          resultBox.textContent =
-            "⚖ Moderate level: You may be experiencing some challenges. Consider healthy coping strategies or talking with a peer/support group 💚";
         } else {
           resultBox.className = "result high";
-          resultBox.textContent =
-            "🚨 High symptoms detected: It may be helpful to talk to a counselor or mental health professional ❤";
+          
+          // Check for crisis (Q9 on PHQ-9 - index 8)
+          if (currentQuiz === 'phq9' && currentAnswers[8] > 0) {
+            showCrisisAlert();
+          }
         }
+
+        let recommendationsHTML = '';
+        if (recommendations.length > 0) {
+          recommendationsHTML = `
+            <div class="recommendations">
+              <h4>📋 Recommendations:</h4>
+              <ul>
+                ${recommendations.map(r => `<li><i class="fas fa-check-circle"></i> ${r}</li>`).join('')}
+              </ul>
+            </div>
+          `;
+        }
+
+        resultBox.innerHTML = `
+          <h3>Your Result: ${severity}</h3>
+          <p>Score: ${total}/${maxScore} (${Math.round(percentage)}%)</p>
+          ${recommendationsHTML}
+          <p style="margin-top: 15px; font-size: 14px;">
+            <i class="fas fa-info-circle"></i> 
+            This is a screening tool, not a diagnosis. Please consult a mental health professional.
+          </p>
+        `;
+      }
+
+      function getRecommendations(quiz, score) {
+        const recs = clinicalQuizzes[quiz].recommendations;
+        if (score <= 4) return recs.minimal;
+        if (score <= 9) return recs.mild;
+        if (score <= 14) return recs.moderate;
+        return recs.severe;
+      }
+
+      async function saveAssessment(category, score, severity, answers) {
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        const token = localStorage.getItem('token');
+        
+        const assessment = {
+          user_id: user ? user.id : 'anonymous',
+          category: category,
+          score: score,
+          severity: severity,
+          responses: answers,
+          date: new Date().toISOString()
+        };
+
+        // Always save to localStorage as backup
+        let assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
+        assessments.push(assessment);
+        localStorage.setItem('assessments', JSON.stringify(assessments));
+
+        // If user is logged in, save to backend
+        if (user && token) {
+          try {
+            const response = await fetch('http://127.0.0.1:5000/api/assessments', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+              },
+              body: JSON.stringify(assessment)
+            });
+
+            if (response.ok) {
+              console.log('✅ Assessment saved to backend');
+              
+              // Show success message
+              const savedMsg = document.createElement('div');
+              savedMsg.className = 'saved-message';
+              savedMsg.innerHTML = '✓ Assessment saved to your profile';
+              document.querySelector('.quiz-header').appendChild(savedMsg);
+              setTimeout(() => savedMsg.remove(), 3000);
+            } else {
+              console.log('⚠️ Failed to save to backend');
+            }
+          } catch (error) {
+            console.log('⚠️ Backend not available, saved locally only');
+          }
+        } else {
+          console.log('📝 Assessment saved locally (login to save permanently)');
+        }
+      }
+
+      function showCrisisAlert() {
+        // Check if alert already exists
+        if (document.querySelector('.crisis-alert')) return;
+        
+        const alert = document.createElement('div');
+        alert.className = 'crisis-alert';
+        alert.innerHTML = `
+          <div class="alert-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Immediate Help Available</h3>
+            <p>You indicated thoughts of self-harm. Please reach out now:</p>
+            <p><strong>NIMHANS Helpline:</strong> 080-46110007</p>
+            <p><strong>AIIMS Helpline:</strong> 011-26588588</p>
+            <p><strong>Emergency:</strong> 112</p>
+            <button onclick="this.parentElement.parentElement.remove()">I Understand</button>
+          </div>
+        `;
+        document.body.appendChild(alert);
       }
 
       function goBack() {
         document.getElementById("quizSection").style.display = "none";
         document.getElementById("menu").style.display = "grid";
         document.getElementById("result").style.display = "none";
+        currentAnswers = [];
       }
+
+      // Add saved message style
+      const style = document.createElement('style');
+      style.textContent = `
+        .saved-message {
+          background: #28a745;
+          color: white;
+          padding: 8px 15px;
+          border-radius: 20px;
+          font-size: 14px;
+          animation: fadeInOut 3s ease;
+        }
+        @keyframes fadeInOut {
+          0% { opacity: 0; transform: translateY(-10px); }
+          10% { opacity: 1; transform: translateY(0); }
+          90% { opacity: 1; transform: translateY(0); }
+          100% { opacity: 0; transform: translateY(-10px); }
+        }
+      `;
+      document.head.appendChild(style);
     </script>
   </body>
 </html>

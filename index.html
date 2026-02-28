@@ -4,6 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mental Wellness Portal</title>
+    <script>
+// Add this to check if backend is available
+window.addEventListener('load', function() {
+    fetch('http://127.0.0.1:5000/')
+        .then(response => response.json())
+        .then(data => {
+            console.log('✅ Connected to backend:', data.message);
+        })
+        .catch(error => {
+            console.warn('⚠️ Backend not running on port 5000');
+            // Show warning but still allow localStorage fallback
+        });
+});
+</script>
     <!-- Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap"
@@ -18,21 +32,25 @@
       body {
         margin: 0;
         font-family: "Poppins", sans-serif;
-        background: linear-gradient(to right, #a8edea, #fed6e3);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: #333;
+        min-height: 100vh;
       }
 
       header {
         text-align: center;
         padding: 1rem 1.5rem;
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(10px);
+        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
       }
 
       .header-content {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        max-width: 1400px;
+        margin: auto;
       }
 
       .logo h1 {
@@ -81,8 +99,52 @@
         transition: color 0.3s;
       }
 
-      .profile i:hover {
-        color: #ff4b5c;
+      .welcome-banner {
+        background: linear-gradient(135deg, #a8edea, #fed6e3);
+        padding: 2rem;
+        border-radius: 20px;
+        margin: 2rem auto;
+        max-width: 1200px;
+        text-align: center;
+        animation: slideIn 0.5s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .recent-activities {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin: 2rem auto;
+        max-width: 1200px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      }
+
+      .recent-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+      }
+
+      .activity-card {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 1.5rem;
+        border-radius: 15px;
+        transition: transform 0.3s;
+      }
+
+      .activity-card:hover {
+        transform: translateY(-5px);
       }
 
       .container {
@@ -90,6 +152,8 @@
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 2rem;
         padding: 3rem;
+        max-width: 1400px;
+        margin: auto;
       }
 
       .card {
@@ -99,10 +163,14 @@
         text-align: center;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
       }
 
       .card:hover {
         transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
       }
 
       .card i {
@@ -117,116 +185,58 @@
         color: #333;
       }
 
+      .badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #ff4b5c;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+      }
+
       footer {
         text-align: center;
         padding: 1.5rem;
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.95);
         font-size: 0.9rem;
         color: #444;
-      }
-      .feedback-widget {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        font-family: "Poppins", sans-serif;
-        z-index: 999;
+        margin-top: 2rem;
       }
 
-      .feedback-btn {
-        background: #ff4b5c;
-        color: white;
-        border: none;
-        border-radius: 30px;
-        padding: 12px 18px;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-        transition: background 0.3s;
-      }
-      .feedback-btn:hover {
-        background: #d63447;
-      }
-
-      .feedback-options {
-        display: none;
-        margin-top: 10px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-        overflow: hidden;
-        animation: fadeIn 0.3s ease;
-      }
-
-      .feedback-options a {
-        display: block;
-        padding: 12px 15px;
-        text-decoration: none;
-        color: #2b6777;
-        font-size: 14px;
-        font-weight: 500;
-        transition: background 0.2s;
-      }
-
-      .feedback-options a:hover {
-        background: #f8f8f8;
-      }
-
-      /* Fade animation */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
       .floating-buttons {
         position: fixed;
         bottom: 20px;
         right: 20px;
         display: flex;
-        flex-direction: column; /* stack vertically */
-        gap: 10px; /* space between buttons */
+        flex-direction: column;
+        gap: 10px;
         z-index: 1000;
       }
 
-      /* Feedback button styling */
+      .btn-feedback, .btn-complaint {
+        padding: 12px 20px;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: 0.3s;
+        text-decoration: none;
+        color: white;
+      }
+
       .btn-feedback {
-        background: #ff4d6d; /* pink */
-        color: white;
-        text-decoration: none;
-        padding: 12px 20px;
-        border-radius: 25px;
-        font-size: 14px;
-        font-weight: bold;
-        text-align: center;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        transition: 0.3s;
+        background: #ff4d6d;
       }
 
-      .btn-feedback:hover {
-        background: #e63950;
-      }
-
-      /* Complaint button styling */
       .btn-complaint {
-        background: linear-gradient(135deg, #00bcd4, #008c9e); /* cyan */
-        color: white;
-        text-decoration: none;
-        padding: 12px 20px;
-        border-radius: 25px;
-        font-size: 14px;
-        font-weight: bold;
-        text-align: center;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        transition: 0.3s;
+        background: linear-gradient(135deg, #00bcd4, #008c9e);
       }
 
-      .btn-complaint:hover {
-        background: linear-gradient(135deg, #008c9e, #006978);
+      .btn-feedback:hover, .btn-complaint:hover {
+        transform: scale(1.05);
       }
 
       .emergency-btn {
@@ -244,6 +254,20 @@
       .emergency-btn:hover {
         background: #d63447;
       }
+
+      .quick-stats {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .stat-item {
+        background: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      }
     </style>
   </head>
   <body>
@@ -251,104 +275,198 @@
       <div class="header-content">
         <div class="logo">
           <h1>🌸 Mental Wellness Portal</h1>
-          <nav>
+          <nav id="mainNav">
             <a href="index.html">Home</a>
-            <a href="AboutUs.html">About Us</a>
-            <a href="HowitWorks.html">How It Works</a>
+            <a href="aboutus.html">About Us</a>
+            <a href="howitworks.html">How It Works</a>
+            <a href="resource.html">Resources</a>
+            <a href="peer.html">Peer Forum</a>
           </nav>
-          <p>Your safe space for stress-free living 💙</p>
         </div>
 
-        <!-- Profile + Login/Signup -->
-        <div class="profile">
-          <a href="login.html">Login</a>
-          <a href="signup.html">Signup</a>
-          <a href="profile.html"><i class="fas fa-user-circle"></i></a>
+        <div class="profile" id="profileSection">
+          <a href="login.html" id="loginLink">Login</a>
+          <a href="signup.html" id="signupLink">Signup</a>
+          <a href="profile.html" id="profileLink" style="display: none;">
+            <i class="fas fa-user-circle"></i>
+          </a>
         </div>
       </div>
     </header>
 
-    <main class="container">
-      <a href="bot.html" style="text-decoration: none; color: inherit">
-        <div class="card">
-          <i class="fas fa-robot"></i>
-          <h3>AI Chatbot</h3>
-          <p>Talk to our AI assistant for instant emotional support.</p>
-        </div>
-      </a>
-      <a href="assign.html" style="text-decoration: none; color: inherit">
-        <div class="card">
-          <i class="fas fa-chart-bar"></i>
-          <h3>Self-Assessment</h3>
-          <p>Check your stress and anxiety levels anonymously.</p>
-        </div>
-      </a>
+    <div id="welcomeBanner" class="welcome-banner" style="display: none;">
+      <h2 id="welcomeMessage"></h2>
+      <p>Your mental wellness journey continues here 💙</p>
+    </div>
 
-      <a href="Appointment.html" style="text-decoration: none; color: inherit">
-        <div class="card">
-          <i class="fas fa-calendar-check"></i>
-          <h3>Book Appointment</h3>
-          <p>Schedule a confidential session with counsellors.</p>
-        </div>
+    <div id="recentActivities" class="recent-activities" style="display: none;">
+      <h2>📊 Your Recent Activity</h2>
+      <div id="recentGrid" class="recent-grid"></div>
+    </div>
+
+    <main class="container" id="mainContainer">
+      <a href="bot.html" class="card">
+        <i class="fas fa-robot"></i>
+        <h3>AI Chatbot</h3>
+        <p>24/7 emotional support</p>
+        <span class="badge">New</span>
       </a>
-      <a href="resource.html" style="text-decoration: none; color: inherit">
-        <div class="card">
-          <i class="fas fa-book-open"></i>
-          <h3>Resource Hub</h3>
-          <p>Explore videos, guides, and relaxation audios.</p>
-        </div>
+      <a href="assign.html" class="card">
+        <i class="fas fa-chart-bar"></i>
+        <h3>Self-Assessment</h3>
+        <p>PHQ-9 & GAD-7 screening</p>
       </a>
-      <a href="peer.html" style="text-decoration: none; color: inherit">
-        <div class="card">
-          <i class="fas fa-users"></i>
-          <h3>Peer Forum</h3>
-          <p>Share experiences with peers in a safe space.</p>
-        </div>
+      <a href="appointment.html" class="card">
+        <i class="fas fa-calendar-check"></i>
+        <h3>Book Appointment</h3>
+        <p>Confidential counseling</p>
+      </a>
+      <a href="resource.html" class="card">
+        <i class="fas fa-book-open"></i>
+        <h3>Resource Hub</h3>
+        <p>Guides & wellness tools</p>
+      </a>
+      <a href="peer.html" class="card">
+        <i class="fas fa-users"></i>
+        <h3>Peer Forum</h3>
+        <p>Share & connect safely</p>
+      </a>
+      <a href="language.html" class="card">
+        <i class="fas fa-language"></i>
+        <h3>Language</h3>
+        <p>Choose your language</p>
       </a>
     </main>
 
-    <div class="floating-buttons">
-      <a href="feedback.html" class="btn-feedback">Feedback</a>
-      <a href="complaint.html" class="btn-complaint">Complaint</a>
+    <div class="quick-stats" id="quickStats">
+      <div class="stat-item">🌱 500+ Students Helped</div>
+      <div class="stat-item">👥 50+ Peer Volunteers</div>
+      <div class="stat-item">📞 24/7 Support Available</div>
     </div>
-    <script>
-      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-      const profileIcon = document.getElementById("profileIcon");
-      const profileMenu = document.getElementById("profileMenu");
 
-      if (currentUser) {
-        // Show Anonymous ID beside icon
-        profileIcon.textContent = currentUser.id;
-      }
-
-      profileIcon.addEventListener("click", () => {
-        if (profileMenu.style.display === "block") {
-          profileMenu.style.display = "none";
-        } else {
-          profileMenu.style.display = "block";
-          profileMenu.innerHTML = `
-      <p><strong>User ID:</strong> ${currentUser.id}</p>
-      <p><strong>Email:</strong> ${currentUser.email}</p>
-      <p><strong>Role:</strong> ${currentUser.role}</p>
-      <button onclick="logout()">Logout</button>
-    `;
-        }
-      });
-
-      function logout() {
-        localStorage.removeItem("currentUser");
-        window.location.href = "start.html";
-      }
-    </script>
+    <div class="floating-buttons">
+      <a href="feedback.html" class="btn-feedback">📝 Feedback</a>
+      <a href="complaint.html" class="btn-complaint">⚠️ Complaint</a>
+    </div>
 
     <footer>
       <p>💡 Need urgent help? Call NIMHANS Helpline: 080-46110007</p>
-      <a href="#" class="emergency-btn"
-        ><i class="fas fa-phone"></i> Emergency Helpline</a
-      >
+      <a href="#" class="emergency-btn">
+        <i class="fas fa-phone"></i> Emergency Helpline
+      </a>
       <p>&copy; 2025 Digital Mental Health | Made for Students</p>
     </footer>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        
+        // Update navigation based on login status
+        if (user) {
+          document.getElementById('loginLink').style.display = 'none';
+          document.getElementById('signupLink').style.display = 'none';
+          document.getElementById('profileLink').style.display = 'inline';
+          
+          // Show welcome banner
+          document.getElementById('welcomeBanner').style.display = 'block';
+          document.getElementById('welcomeMessage').innerHTML = 
+            `Welcome back, ${user.role} ${user.id}! 🌟`;
+          
+          // Add role-specific menu items
+          const nav = document.getElementById('mainNav');
+          if (user.role === 'Counsellor') {
+            nav.innerHTML += '<a href="counsellor-dashboard.html">Dashboard</a>';
+          } else if (user.role === 'Student') {
+            loadRecentActivities(user.id);
+          } else if (user.role === 'Organization') {
+            nav.innerHTML += '<a href="admin-dashboard.html">Admin</a>';
+          }
+        }
+
+        // Check for pending appointments
+        checkPendingAppointments();
+      });
+
+      async function loadRecentActivities(userId) {
+        try {
+          const response = await fetch(`http://localhost:5000/api/assessments/${userId}`);
+          const assessments = await response.json();
+          
+          if (assessments && assessments.length > 0) {
+            document.getElementById('recentActivities').style.display = 'block';
+            const grid = document.getElementById('recentGrid');
+            
+            assessments.slice(0, 3).forEach(a => {
+              const severityClass = a.severity.toLowerCase().includes('severe') ? 'severe' : 
+                                   a.severity.toLowerCase().includes('moderate') ? 'moderate' : 'mild';
+              
+              grid.innerHTML += `
+                <div class="activity-card ${severityClass}">
+                  <h4>${a.category}</h4>
+                  <p>Severity: ${a.severity}</p>
+                  <small>${new Date(a.date).toLocaleDateString()}</small>
+                </div>
+              `;
+            });
+          }
+        } catch (error) {
+          console.log('Using local data fallback');
+          // Load from localStorage as fallback
+          const localAssessments = JSON.parse(localStorage.getItem('assessments') || '[]');
+          if (localAssessments.length > 0) {
+            document.getElementById('recentActivities').style.display = 'block';
+            // Display local assessments...
+          }
+        }
+      }
+
+      function checkPendingAppointments() {
+        const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+        const pending = appointments.filter(a => a.status === 'pending').length;
+        
+        if (pending > 0) {
+          // Show notification
+          const notification = document.createElement('div');
+          notification.className = 'notification';
+          notification.innerHTML = `
+            <i class="fas fa-bell"></i>
+            You have ${pending} pending appointment${pending > 1 ? 's' : ''}
+          `;
+          document.body.appendChild(notification);
+          
+          setTimeout(() => notification.remove(), 5000);
+        }
+      }
+    </script>
+
+    <style>
+      .mild { border-left: 5px solid #4caf50; }
+      .moderate { border-left: 5px solid #ff9800; }
+      .severe { border-left: 5px solid #f44336; }
+      
+      .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #2b6777;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        animation: slideInRight 0.3s ease;
+        z-index: 2000;
+      }
+      
+      @keyframes slideInRight {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+    </style>
   </body>
 </html>
-
-

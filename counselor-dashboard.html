@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counsellor Dashboard | Mental Wellness Portal</title>
+    <script>
+// Add this to check if backend is available
+window.addEventListener('load', function() {
+    fetch('http://127.0.0.1:5000/')
+        .then(response => response.json())
+        .then(data => {
+            console.log('✅ Connected to backend:', data.message);
+        })
+        .catch(error => {
+            console.warn('⚠️ Backend not running on port 5000');
+            // Show warning but still allow localStorage fallback
+        });
+});
+</script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #2b6777;
+            font-size: 1.8rem;
+        }
+
+        .header h1 i {
+            margin-right: 10px;
+            color: #ff4b5c;
+        }
+
+        .counsellor-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .counsellor-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #2b6777;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card i {
+            font-size: 40px;
+            color: #2b6777;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Main Content Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        /* Appointments Section */
+        .appointments-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            color: #2b6777;
+            font-size: 1.4rem;
+        }
+
+        .section-header h2 i {
+            margin-right: 10px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-tab {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            background: #f0f0f0;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .filter-tab.active {
+            background: #2b6777;
+            color: white;
+        }
+
+        .appointment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .appointment-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 5px solid #2b6777;
+            transition: 0.3s;
+        }
+
+        .appointment-card.pending {
+            border-left-color: #ffc107;
+        }
+
+        .appointment-card.confirmed {
+            border-left-color: #28a745;
+        }
+
+        .appointment-card.completed {
+            border-left-color: #6c757d;
+            opacity: 0.8;
+        }
+
+        .appointment-info h4 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .appointment-info p {
+            color: #666;
+            font-size: 14px;
+            margin: 3px 0;
+        }
+
+        .appointment-info i {
+            width: 20px;
+            color: #2b6777;
+        }
+
+        .appointment-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .btn-confirm {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: #218838;
+        }
+
+        .btn-reschedule {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-complete {
+            background: #2b6777;
+            color: white;
+        }
+
+        .btn-video {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn i {
+            margin-right: 5px;
+        }
+
+        /* Availability Section */
+        .availability-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .availability-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 15px;
+            appearance: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .toggle-switch:checked {
+            background: #28a745;
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: 0.3s;
+        }
+
+        .toggle-switch:checked::before {
+            left: 32px;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .time-slot {
+            padding: 10px;
+            text-align: center;
+            background: #f0f0f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .time-slot.selected {
+            background: #2b6777;
+            color: white;
+        }
+
+        .time-slot.booked {
+            background: #ffc107;
+            color: #333;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Recent Assessments */
+        .assessments-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .assessment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .assessment-item:last-child {
+            border-bottom: none;
+        }
+
+        .severity-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .severity-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .severity-moderate {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .severity-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #333;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .action-btn:hover {
+            transform: translateX(5px);
+            background: #f8f9fa;
+        }
+
+        .action-btn i {
+            font-size: 30px;
+            color: #2b6777;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #2b6777;
+        }
+
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .modal-buttons .save {
+            background: #2b6777;
+            color: white;
+        }
+
+        .modal-buttons .cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-user-md"></i>
+                Counsellor Dashboard
+            </h1>
+            <div class="counsellor-info">
+                <span id="counsellorName">Dr. Asha Patil</span>
+                <div class="counsellor-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-calendar-check"></i>
+                <div class="stat-number" id="todayAppointments">0</div>
+                <div class="stat-label">Today's Appointments</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock"></i>
+                <div class="stat-number" id="pendingAppointments">0</div>
+                <div class="stat-label">Pending Requests</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-users"></i>
+                <div class="stat-number" id="totalStudents">0</div>
+                <div class="stat-label">Students Helped</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-chart-line"></i>
+                <div class="stat-number" id="completionRate">0%</div>
+                <div class="stat-label">Session Completion</div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Appointments Section -->
+            <div class="appointments-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-alt"></i> Appointments</h2>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" onclick="filterAppointments('all')">All</button>
+                        <button class="filter-tab" onclick="filterAppointments('pending')">Pending</button>
+                        <button class="filter-tab" onclick="filterAppointments('today')">Today</button>
+                    </div>
+                </div>
+                
+                <div class="appointment-list" id="appointmentList">
+                    <!-- Appointments will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Availability Section -->
+            <div class="availability-section">
+                <h2><i class="fas fa-clock"></i> Set Availability</h2>
+                
+                <div class="availability-toggle">
+                    <span>Available for Appointments</span>
+                    <input type="checkbox" class="toggle-switch" id="availabilityToggle" checked onchange="toggleAvailability()">
+                </div>
+
+                <h3>Today's Slots</h3>
+                <div class="time-slots" id="timeSlots">
+                    <!-- Time slots will be loaded here -->
+                </div>
+
+                <button class="btn btn-confirm" style="width: 100%; margin-top: 15px;" onclick="saveAvailability()">
+                    <i class="fas fa-save"></i> Save Availability
+                </button>
+            </div>
+        </div>
+
+        <!-- Recent Assessments -->
+        <div class="assessments-section">
+            <div class="section-header">
+                <h2><i class="fas fa-clipboard-list"></i> Recent Student Assessments</h2>
+                <a href="assign.html" style="color: #2b6777;">View All →</a>
+            </div>
+            
+            <div id="recentAssessments">
+                <!-- Assessments will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="appointment.html" class="action-btn">
+                <i class="fas fa-plus-circle"></i>
+                <div>
+                    <h4>Create Appointment</h4>
+                    <small>Schedule new session</small>
+                </div>
+            </a>
+            <a href="#" class="action-btn" onclick="openNotesModal()">
+                <i class="fas fa-notes-medical"></i>
+                <div>
+                    <h4>Session Notes</h4>
+                    <small>Add consultation notes</small>
+                </div>
+            </a>
+            <a href="resource.html" class="action-btn">
+                <i class="fas fa-share-alt"></i>
+                <div>
+                    <h4>Share Resources</h4>
+                    <small>Send to students</small>
+                </div>
+            </a>
+            <a href="#" class="action-btn" onclick="openReportModal()">
+                <i class="fas fa-file-alt"></i>
+                <div>
+                    <h4>Generate Report</h4>
+                    <small>Weekly summary</small>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Session Notes Modal -->
+    <div id="notesModal" class="modal">
+        <div class="modal-content">
+            <h3>Add Session Notes</h3>
+            <select id="studentSelect">
+                <option value="">Select Student</option>
+            </select>
+            <textarea id="sessionNotes" rows="5" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px;" placeholder="Enter your notes..."></textarea>
+            <div class="modal-buttons">
+                <button class="save" onclick="saveNotes()">Save Notes</button>
+                <button class="cancel" onclick="closeModal('notesModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <h3>Generate Report</h3>
+            <select id="reportType">
+                <option value="weekly">Weekly Summary</option>
+                <option value="monthly">Monthly Report</option>
+                <option value="student">Student Progress</option>
+            </select>
+            <input type="date" id="reportDate">
+            <div class="modal-buttons">
+                <button class="save" onclick="generateReport()">Generate</button>
+                <button class="cancel" onclick="closeModal('reportModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load counsellor data
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user && user.role === 'Counsellor') {
+                document.getElementById('counsellorName').textContent = user.email || 'Dr. Asha Patil';
+            }
+            
+            loadAppointments();
+            loadTimeSlots();
+            loadAssessments();
+            updateStats();
+        });
+
+        // Sample appointments data
+        const appointments = [
+            {
+                id: 1,
+                student: "Student_1234",
+                time: "10:00 AM",
+                date: "2024-01-15",
+                type: "Online",
+                status: "confirmed",
+                concern: "Anxiety"
+            },
+            {
+                id: 2,
+                student: "Student_5678",
+                time: "2:00 PM",
+                date: "2024-01-15",
+                type: "In-person",
+                status: "pending",
+                concern: "Depression"
+            },
+            {
+                id: 3,
+                student: "Student_9012",
+                time: "4:30 PM",
+                date: "2024-01-15",
+                type: "Online",
+                status: "completed",
+                concern: "Academic Stress"
+            }
+        ];
+
+        function loadAppointments() {
+            const list = document.getElementById('appointmentList');
+            list.innerHTML = '';
+            
+            appointments.forEach(apt => {
+                list.innerHTML += `
+                    <div class="appointment-card ${apt.status}">
+                        <div class="appointment-info">
+                            <h4>${apt.student}</h4>
+                            <p><i class="fas fa-clock"></i> ${apt.date} at ${apt.time}</p>
+                            <p><i class="fas fa-tag"></i> ${apt.concern} · ${apt.type}</p>
+                        </div>
+                        <div class="appointment-actions">
+                            ${apt.status === 'pending' ? 
+                                `<button class="btn btn-confirm" onclick="updateAppointment(${apt.id}, 'confirm')">
+                                    <i class="fas fa-check"></i> Confirm
+                                </button>
+                                <button class="btn btn-reschedule" onclick="openRescheduleModal(${apt.id})">
+                                    <i class="fas fa-clock"></i>
+                                </button>` : 
+                                apt.status === 'confirmed' ?
+                                `<button class="btn btn-complete" onclick="updateAppointment(${apt.id}, 'complete')">
+                                    <i class="fas fa-check-double"></i> Complete
+                                </button>
+                                <button class="btn btn-video" onclick="startVideoCall(${apt.id})">
+                                    <i class="fas fa-video"></i>
+                                </button>` :
+                                `<span class="completed-label">Session Completed</span>`
+                            }
+                        </div>
+                    </div>
+                `;
+            });
+            
+            updateStats();
+        }
+
+        function loadTimeSlots() {
+            const slots = ['9:00 AM', '10:00 AM', '11:00 AM', '2:00 PM', '3:00 PM', '4:00 PM'];
+            const container = document.getElementById('timeSlots');
+            container.innerHTML = '';
+            
+            slots.forEach(slot => {
+                const isBooked = Math.random() > 0.7; // Randomly mark some as booked
+                container.innerHTML += `
+                    <div class="time-slot ${isBooked ? 'booked' : ''}" onclick="selectTimeSlot(this, '${slot}')">
+                        ${slot}
+                    </div>
+                `;
+            });
+        }
+
+        function selectTimeSlot(element, slot) {
+            if (!element.classList.contains('booked')) {
+                element.classList.toggle('selected');
+            }
+        }
+
+        function loadAssessments() {
+            const container = document.getElementById('recentAssessments');
+            const assessments = [
+                { student: "Student_1234", type: "PHQ-9", score: 15, severity: "Moderate", date: "2024-01-14" },
+                { student: "Student_5678", type: "GAD-7", score: 12, severity: "Moderate", date: "2024-01-14" },
+                { student: "Student_9012", type: "PHQ-9", score: 22, severity: "High", date: "2024-01-13" }
+            ];
+            
+            container.innerHTML = assessments.map(a => `
+                <div class="assessment-item">
+                    <div>
+                        <strong>${a.student}</strong>
+                        <p style="font-size: 12px; color: #666;">${a.type} · ${a.date}</p>
+                    </div>
+                    <div>
+                        <span class="severity-badge severity-${a.severity.toLowerCase()}">${a.severity}</span>
+                        <span style="margin-left: 10px;">Score: ${a.score}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('todayAppointments').textContent = '3';
+            document.getElementById('pendingAppointments').textContent = '1';
+            document.getElementById('totalStudents').textContent = '127';
+            document.getElementById('completionRate').textContent = '94%';
+        }
+
+        function filterAppointments(filter) {
+            document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            loadAppointments(); // In real app, filter here
+        }
+
+        function updateAppointment(id, action) {
+            alert(`Appointment ${id} ${action}ed successfully!`);
+            loadAppointments();
+        }
+
+        function toggleAvailability() {
+            const toggle = document.getElementById('availabilityToggle');
+            alert(`You are now ${toggle.checked ? 'available' : 'unavailable'} for appointments`);
+        }
+
+        function saveAvailability() {
+            const selectedSlots = document.querySelectorAll('.time-slot.selected');
+            alert(`Availability saved for ${selectedSlots.length} time slots`);
+        }
+
+        function startVideoCall(id) {
+            const meetLink = `https://meet.google.com/${Math.random().toString(36).substring(7)}`;
+            window.open(meetLink, '_blank');
+        }
+
+        function openNotesModal() {
+            document.getElementById('notesModal').style.display = 'flex';
+            // Populate student select
+            const select = document.getElementById('studentSelect');
+            select.innerHTML = `
+                <option value="">Select Student</option>
+                ${appointments.map(apt => `<option value="${apt.id}">${apt.student}</option>`).join('')}
+            `;
+        }
+
+        function saveNotes() {
+            alert('Session notes saved successfully!');
+            closeModal('notesModal');
+        }
+
+        function openRescheduleModal(id) {
+            const newDate = prompt('Enter new date (YYYY-MM-DD):');
+            const newTime = prompt('Enter new time:');
+            if (newDate && newTime) {
+                alert(`Appointment rescheduled to ${newDate} at ${newTime}`);
+            }
+        }
+
+        function openReportModal() {
+            document.getElementById('reportModal').style.display = 'flex';
+        }
+
+        function generateReport() {
+            alert('Report generated successfully!');
+            closeModal('reportModal');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

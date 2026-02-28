@@ -4,6 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Signup | Mental Wellness Portal</title>
+    <script>
+// Add this to check if backend is available
+window.addEventListener('load', function() {
+    fetch('http://127.0.0.1:5000/')
+        .then(response => response.json())
+        .then(data => {
+            console.log('✅ Connected to backend:', data.message);
+        })
+        .catch(error => {
+            console.warn('⚠️ Backend not running on port 5000');
+            // Show warning but still allow localStorage fallback
+        });
+});
+</script>
     <style>
       body {
         font-family: Poppins, sans-serif;
@@ -62,25 +76,44 @@
       <button onclick="signup()">Signup</button>
     </div>
 
+
     <script>
-      function signup() {
-        let role = document.getElementById("role").value;
-        let email = document.getElementById("email").value;
-        let password = document.getElementById("password").value;
+async function signup() {
+    let role = document.getElementById("role").value;
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
 
-        if (!role || !email || !password) {
-          alert("All fields are required!");
-          return;
+    if (!role || !email || !password) {
+        alert("All fields are required!");
+        return;
+    }
+
+    try {
+        const response = await fetch('http://127.0.0.1:5000/api/auth/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password, role })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Save token and user data
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('currentUser', JSON.stringify(data.user));
+            
+            alert("Signup successful! Your Anonymous ID is " + data.user.id);
+            window.location.href = "index.html";
+        } else {
+            alert(data.error || "Signup failed!");
         }
-
-        let userId = "User" + Math.floor(1000 + Math.random() * 9000);
-        let user = { id: userId, email, password, role };
-
-        localStorage.setItem("currentUser", JSON.stringify(user));
-
-        alert("Signup successful! Your Anonymous ID is " + userId);
-        window.location.href = "index.html"; // Redirect to home
-      }
-    </script>
+    } catch (error) {
+        alert("Cannot connect to server. Make sure backend is running on port 5000");
+        console.error(error);
+    }
+}
+</script>
   </body>
 </html>
