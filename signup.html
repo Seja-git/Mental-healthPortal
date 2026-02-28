@@ -4,116 +4,374 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Signup | Mental Wellness Portal</title>
-    <script>
-// Add this to check if backend is available
-window.addEventListener('load', function() {
-    fetch('http://127.0.0.1:5000/')
-        .then(response => response.json())
-        .then(data => {
-            console.log('✅ Connected to backend:', data.message);
-        })
-        .catch(error => {
-            console.warn('⚠️ Backend not running on port 5000');
-            // Show warning but still allow localStorage fallback
-        });
-});
-</script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
       body {
-        font-family: Poppins, sans-serif;
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        background: linear-gradient(to right, #a8edea, #fed6e3);
       }
-      .box {
+      
+      .signup-container {
         background: white;
-        padding: 2rem;
-        border-radius: 15px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-        text-align: center;
-        width: 350px;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        width: 90%;
+        max-width: 450px;
+        animation: slideUp 0.5s ease;
       }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
       h2 {
         color: #2b6777;
-        margin-bottom: 1rem;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2rem;
       }
-      input,
-      select,
+
+      .input-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 500;
+      }
+
+      input, select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 16px;
+        font-family: "Poppins", sans-serif;
+        transition: all 0.3s;
+        box-sizing: border-box;
+      }
+
+      select {
+        cursor: pointer;
+        background: white;
+      }
+
+      input:focus, select:focus {
+        outline: none;
+        border-color: #2b6777;
+        box-shadow: 0 0 0 3px rgba(43,103,119,0.1);
+      }
+
       button {
         width: 100%;
-        padding: 0.7rem;
-        margin: 0.5rem 0;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-family: Poppins;
-      }
-      button {
-        background: #2b6777;
+        padding: 14px;
+        background: linear-gradient(135deg, #2b6777, #1e4d5a);
         color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
         font-weight: bold;
         cursor: pointer;
         transition: 0.3s;
+        margin-top: 10px;
+        font-family: "Poppins", sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
       }
-      button:hover {
-        background: #ff4b5c;
+
+      button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      }
+
+      button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      .links {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .links a {
+        color: #2b6777;
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      .links a:hover {
+        text-decoration: underline;
+      }
+
+      .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+        text-align: center;
+        font-size: 14px;
+      }
+
+      .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+        text-align: center;
+        font-size: 14px;
+      }
+
+      .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #2b6777;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .role-info {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
       }
     </style>
   </head>
   <body>
-    <div class="box">
-      <h2>Create Account</h2>
-      <select id="role">
-        <option value="">-- Select Role --</option>
-        <option value="Student">Student</option>
-        <option value="Counsellor">Counsellor</option>
-        <option value="Volunteer">Volunteer</option>
-        <option value="Organization">Organization</option>
-      </select>
-      <input type="text" id="email" placeholder="Enter Email" />
-      <input type="password" id="password" placeholder="Enter Password" />
-      <button onclick="signup()">Signup</button>
+    <div class="signup-container">
+      <h2>🌸 Create Account</h2>
+      
+      <div id="errorMessage" class="error-message">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="errorText"></span>
+      </div>
+      
+      <div id="successMessage" class="success-message">
+        <i class="fas fa-check-circle"></i>
+        <span id="successText"></span>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-user-tag" style="color: #2b6777; margin-right: 5px;"></i> Select Role</label>
+        <select id="role">
+          <option value="">-- Select Your Role --</option>
+          <option value="student">Student</option>
+          <option value="counsellor">Counsellor</option>
+          <option value="organization">Organization / Admin</option>
+          <option value="volunteer">Peer Volunteer</option>
+        </select>
+        <div class="role-info"><i class="fas fa-info-circle"></i> Organization role gives access to admin dashboard</div>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-envelope" style="color: #2b6777; margin-right: 5px;"></i> Email</label>
+        <input type="email" id="email" placeholder="Enter your email" />
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-lock" style="color: #2b6777; margin-right: 5px;"></i> Password</label>
+        <input type="password" id="password" placeholder="Choose a password (min. 6 characters)" />
+      </div>
+
+      <button onclick="signup()" id="signupBtn">
+        <span id="buttonText">Create Account</span>
+        <span id="loadingSpinner" class="loading-spinner" style="display: none;"></span>
+      </button>
+
+      <div class="links">
+        <a href="login.html"><i class="fas fa-sign-in-alt"></i> Already have an account? Login</a>
+      </div>
     </div>
 
-
     <script>
-async function signup() {
-    let role = document.getElementById("role").value;
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
+      // Check if user is already logged in
+      document.addEventListener('DOMContentLoaded', function() {
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (user) {
+          console.log("User already logged in:", user);
+          redirectBasedOnRole(user.role);
+        }
+      });
 
-    if (!role || !email || !password) {
-        alert("All fields are required!");
-        return;
-    }
+      async function signup() {
+        const role = document.getElementById("role").value;
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const errorDiv = document.getElementById("errorMessage");
+        const successDiv = document.getElementById("successMessage");
+        const errorText = document.getElementById("errorText");
+        const successText = document.getElementById("successText");
+        const signupBtn = document.getElementById("signupBtn");
+        const buttonText = document.getElementById("buttonText");
+        const loadingSpinner = document.getElementById("loadingSpinner");
 
-    try {
-        const response = await fetch('http://127.0.0.1:5000/api/auth/signup', {
+        // Clear previous messages
+        errorDiv.style.display = "none";
+        successDiv.style.display = "none";
+
+        // Validate inputs
+        if (!role) {
+          showError("Please select a role!");
+          return;
+        }
+
+        if (!email) {
+          showError("Email is required!");
+          return;
+        }
+
+        if (!email.includes('@') || !email.includes('.')) {
+          showError("Please enter a valid email address!");
+          return;
+        }
+
+        if (!password) {
+          showError("Password is required!");
+          return;
+        }
+
+        if (password.length < 6) {
+          showError("Password must be at least 6 characters!");
+          return;
+        }
+
+        // Show loading state
+        signupBtn.disabled = true;
+        buttonText.style.display = "none";
+        loadingSpinner.style.display = "inline-block";
+
+        try {
+          console.log("Attempting signup:", { email, role });
+          
+          const response = await fetch('http://127.0.0.1:5000/api/auth/signup', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+              'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password, role })
-        });
+            body: JSON.stringify({ 
+              email, 
+              password, 
+              role: role.toLowerCase() 
+            })
+          });
 
-        const data = await response.json();
+          const data = await response.json();
+          console.log("Signup response:", data);
 
-        if (response.ok) {
+          if (response.ok) {
             // Save token and user data
             localStorage.setItem('token', data.token);
             localStorage.setItem('currentUser', JSON.stringify(data.user));
             
-            alert("Signup successful! Your Anonymous ID is " + data.user.id);
-            window.location.href = "index.html";
-        } else {
-            alert(data.error || "Signup failed!");
+            // Show success message
+            successText.textContent = `✅ Account created successfully! Welcome ${data.user.role}`;
+            successDiv.style.display = "block";
+            
+            // Redirect based on role after 2 seconds
+            setTimeout(() => {
+              redirectBasedOnRole(data.user.role);
+            }, 2000);
+            
+          } else {
+            // Reset button state
+            signupBtn.disabled = false;
+            buttonText.style.display = "inline";
+            loadingSpinner.style.display = "none";
+            
+            showError(data.error || "Signup failed! Please try again.");
+          }
+        } catch (error) {
+          console.error("Signup error:", error);
+          
+          // Reset button state
+          signupBtn.disabled = false;
+          buttonText.style.display = "inline";
+          loadingSpinner.style.display = "none";
+          
+          showError("Cannot connect to server. Make sure backend is running on port 5000");
         }
-    } catch (error) {
-        alert("Cannot connect to server. Make sure backend is running on port 5000");
-        console.error(error);
-    }
-}
-</script>
+      }
+
+      function redirectBasedOnRole(role) {
+        console.log("Redirecting based on role:", role);
+        
+        // Normalize role to lowercase for consistent comparison
+        const normalizedRole = role ? role.toLowerCase() : '';
+        
+        switch(normalizedRole) {
+          case 'counsellor':
+          case 'counselor':  // Handle both spellings
+            console.log("➡️ Redirecting to counselor dashboard");
+            window.location.href = "counselor-dashboard.html";
+            break;
+            
+          case 'organization':
+          case 'admin':
+            console.log("➡️ Redirecting to admin dashboard");
+            window.location.href = "admin-dashboard.html";
+            break;
+            
+          case 'student':
+          default:
+            console.log("➡️ Redirecting to home page");
+            window.location.href = "index.html";
+            break;
+        }
+      }
+
+      function showError(message) {
+        const errorDiv = document.getElementById("errorMessage");
+        const errorText = document.getElementById("errorText");
+        errorText.textContent = message;
+        errorDiv.style.display = "block";
+        
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+          errorDiv.style.display = "none";
+        }, 5000);
+      }
+
+      // Handle Enter key press
+      document.getElementById('password').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          signup();
+        }
+      });
+
+      document.getElementById('email').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          document.getElementById('password').focus();
+        }
+      });
+    </script>
   </body>
 </html>
